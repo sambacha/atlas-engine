@@ -1,4 +1,4 @@
-FROM hengine/atlas-base-osjdk:latest
+FROM atlasengine/atlas-base-osjdk:latest
 
 RUN touch /firststart.txt
 
