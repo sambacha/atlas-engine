@@ -1,0 +1,814 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Resources" : {
+        "AtlasVpc" : {
+            "Type" : "AWS::EC2::VPC",
+            "Properties" : {
+                "CidrBlock" : "192.168.0.0/16",
+                "EnableDnsHostnames" : true ,
+                "EnableDnsSupport" : true,
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasVpc"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasInternetGateway" : {
+            "Type" : "AWS::EC2::InternetGateway",
+            "Properties" : {
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasInternetGateway"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasIgwAttachment" : {
+            "Type" : "AWS::EC2::VPCGatewayAttachment",
+            "DependsOn" : [ "AtlasVpc", "AtlasInternetGateway" ],
+            "Properties" : {
+                "InternetGatewayId" : {
+                    "Ref" : "AtlasInternetGateway" 
+                },
+                "VpcId" : {
+                    "Ref" : "AtlasVpc" 
+                }
+            }
+        },
+        "AtlasPubSubnetZone1" : {
+            "Type" : "AWS::EC2::Subnet",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "AvailabilityZone" : {
+                    "Fn::Join" : [ "", [
+                        {
+                            "Ref" : "AWS::Region"
+                        },
+                        "a"
+                    ] ]
+                },
+                "CidrBlock" : "192.168.1.0/24",
+                "MapPublicIpOnLaunch" : true,
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasPubSubnetZone1"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasAppSubnetZone1" : {
+            "Type" : "AWS::EC2::Subnet",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "AvailabilityZone" : {
+                    "Fn::Join" : [ "", [
+                        {
+                            "Ref" : "AWS::Region"
+                        },
+                        "a"
+                    ] ]
+                },
+                "CidrBlock" : "192.168.2.0/24",
+                "MapPublicIpOnLaunch" : false,
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasAppSubnetZone1"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasDbSubnetZone1" : {
+            "Type" : "AWS::EC2::Subnet",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "AvailabilityZone" : {
+                    "Fn::Join" : [ "", [
+                        {
+                            "Ref" : "AWS::Region"
+                        },
+                        "a"
+                    ] ]
+                },
+                "CidrBlock" : "192.168.3.0/24",
+                "MapPublicIpOnLaunch" : false,
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasDbSubnetZone1"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasPubSubnetZone2" : {
+            "Type" : "AWS::EC2::Subnet",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "AvailabilityZone" : {
+                    "Fn::Join" : [ "", [
+                        {
+                            "Ref" : "AWS::Region"
+                        },
+                        "b"
+                    ] ]
+                },
+                "CidrBlock" : "192.168.4.0/24",
+                "MapPublicIpOnLaunch" : true,
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasPubSubnetZone2"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasAppSubnetZone2" : {
+            "Type" : "AWS::EC2::Subnet",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "AvailabilityZone" : {
+                    "Fn::Join" : [ "", [
+                        {
+                            "Ref" : "AWS::Region"
+                        },
+                        "b"
+                    ] ]
+                },
+                "CidrBlock" : "192.168.5.0/24",
+                "MapPublicIpOnLaunch" : false,
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasAppSubnetZone2"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasDbSubnetZone2" : {
+            "Type" : "AWS::EC2::Subnet",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "AvailabilityZone" : {
+                    "Fn::Join" : [ "", [
+                        {
+                            "Ref" : "AWS::Region"
+                        },
+                        "b"
+                    ] ]
+                },
+                "CidrBlock" : "192.168.6.0/24",
+                "MapPublicIpOnLaunch" : false,
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasDbSubnetZone2"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasNatGatewayEIPZone1" : {
+            "Type" : "AWS::EC2::EIP",
+            "DependsOn" : "AtlasIgwAttachment",
+            "Properties" : {
+                "Domain" : "vpc",
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasNatGatewayEIPZone1"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasNatGatewayEIPZone2" : {
+            "Type" : "AWS::EC2::EIP",
+            "DependsOn" : "AtlasIgwAttachment",
+            "Properties" : {
+                "Domain" : "vpc",
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasNatGatewayEIPZone2"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasPubRouteTable" : {
+            "Type" : "AWS::EC2::RouteTable",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasPubRouteTable"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasDefaultPubRoute" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : ["AtlasPubRouteTable", "AtlasIgwAttachment"],
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "AtlasPubRouteTable"
+                },
+                "DestinationCidrBlock" : "0.0.0.0/0",
+                "GatewayId" : {
+                    "Ref" : "AtlasInternetGateway"
+                }
+            }
+        },
+        "AtlasPubSubnetZone1RTAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "AtlasPubRouteTable"
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasPubSubnetZone1"
+                }
+            }
+        },
+        "AtlasPubSubnetZone2RTAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "AtlasPubRouteTable"
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasPubSubnetZone2"
+                }
+            }
+        },
+        "AtlasPrivateZone1RouteTable" : {
+            "Type" : "AWS::EC2::RouteTable",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasPrivateZone1RouteTable"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasPrivateZone2RouteTable" : {
+            "Type" : "AWS::EC2::RouteTable",
+            "Properties" : {
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasPrivateZone2RouteTable"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasAppSubnetZone1RouteTableAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "AtlasPrivateZone1RouteTable"
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasAppSubnetZone1"
+                }
+            }
+        },
+        "AtlasDbSubnetZone1RouteTableAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "AtlasPrivateZone1RouteTable"
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasDbSubnetZone1"
+                }
+            }
+        },
+        "AtlasAppSubnetZone2RouteTableAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "AtlasPrivateZone2RouteTable"
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasAppSubnetZone2"
+                }
+            }
+        },
+        "AtlasDbSubnetZone2RouteTableAssociation" : {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "RouteTableId" : {
+                    "Ref" : "AtlasPrivateZone2RouteTable"
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasDbSubnetZone2"
+                }
+            }
+        },        
+        "AtlasPubSecurityGroup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+                "GroupDescription" : "Public security group",
+                "GroupName" : "AtlasPubSg",
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "SecurityGroupIngress" : [ 
+                    {
+                        "CidrIp" : "0.0.0.0/0",
+                        "FromPort" : 22,
+                        "IpProtocol" : "tcp",
+                        "ToPort" : 22
+                    }, 
+                    {
+                        "CidrIp" : "0.0.0.0/0",
+                        "FromPort" : 80,
+                        "IpProtocol" : "tcp",
+                        "ToPort" : 80
+                    }, 
+                    {
+                        "CidrIp" : "0.0.0.0/0",
+                        "FromPort" : 443,
+                        "IpProtocol" : "tcp",
+                        "ToPort" : 443
+                    }
+                ],
+                "SecurityGroupEgress" : [ 
+                    {
+                        "CidrIp" : "0.0.0.0/0",
+                        "IpProtocol" : "-1"
+                    }
+                ],
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasPubSecurityGroup"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasAppSecurityGroup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+                "GroupDescription" : "Application services security group",
+                "GroupName" : "AtlasAppSg",
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasAppSecurityGroup"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasAppSecurityGroupIngressPort22" : {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "DependsOn" : "AtlasAppSecurityGroup",
+            "Properties" : {
+                "FromPort" : 22,
+                "IpProtocol" : "tcp",
+                "ToPort" : 22,
+                "GroupId" : {
+                    "Ref" : "AtlasAppSecurityGroup"
+                },
+                "SourceSecurityGroupId" : {
+                    "Ref" : "AtlasPubSecurityGroup"
+                }
+            }     
+        },
+        "AtlasAppSecurityGroupIngressPort8080" : {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "DependsOn" : "AtlasAppSecurityGroup",
+            "Properties" : {
+                "CidrIp" : "0.0.0.0/0",
+                "FromPort" : 8080,
+                "IpProtocol" : "tcp",
+                "ToPort" : 8080,
+                "GroupId" : {
+                    "Ref" : "AtlasAppSecurityGroup"
+                }
+            }
+        },
+        "AtlasAppSecurityGroupIngressPort8443" : {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "DependsOn" : "AtlasAppSecurityGroup",
+            "Properties" : {
+                "CidrIp" : "0.0.0.0/0",
+                "FromPort" : 8443,
+                "IpProtocol" : "tcp",
+                "ToPort" : 8443,
+                "GroupId" : {
+                    "Ref" : "AtlasAppSecurityGroup"
+                }
+            }
+        },
+        "AtlasAppSecurityGroupIngressPort80" : {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "DependsOn" : "AtlasAppSecurityGroup",
+            "Properties" : {
+                "CidrIp" : "0.0.0.0/0",
+                "FromPort" : 80,
+                "IpProtocol" : "tcp",
+                "ToPort" : 80,
+                "GroupId" : {
+                    "Ref" : "AtlasAppSecurityGroup"
+                }
+            }
+        },
+        "AtlasAppSecurityGroupIngressPort443" : {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "DependsOn" : "AtlasAppSecurityGroup",
+            "Properties" : {
+                "CidrIp" : "0.0.0.0/0",
+                "FromPort" : 443,
+                "IpProtocol" : "tcp",
+                "ToPort" : 443,
+                "GroupId" : {
+                    "Ref" : "AtlasAppSecurityGroup"
+                }
+            }
+        },
+        "AtlasAppSecurityGroupEgress" : {
+            "Type" : "AWS::EC2::SecurityGroupEgress",
+            "Properties" : {
+                "CidrIp" : "0.0.0.0/0",
+                "IpProtocol" : "-1",
+                "GroupId" : {
+                    "Ref" : "AtlasAppSecurityGroup"
+                }
+            }
+        },
+        "AtlasDbSecurityGroup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "DependsOn" : [ "AtlasPubSecurityGroup", "AtlasAppSecurityGroup" ],
+            "Properties" : {
+                "GroupDescription" : "Database security group",
+                "GroupName" : "AtlasDbSg",
+                "VpcId" : {
+                    "Ref" : "AtlasVpc"
+                },
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "AtlasDbSecurityGroup"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        },
+        "AtlasDbSecurityGroupIngressPort5432Pub" : {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "DependsOn" : "AtlasDbSecurityGroup",
+            "Properties" : {
+                "FromPort" : 5432,
+                "IpProtocol" : "tcp",
+                "ToPort" : 5432,
+                "GroupId" : {
+                    "Ref" : "AtlasDbSecurityGroup"
+                },
+                "SourceSecurityGroupId" : {
+                    "Ref" : "AtlasPubSecurityGroup"
+                }
+            }     
+        },
+        "AtlasDbSecurityGroupIngressPort5432App" : {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "DependsOn" : "AtlasDbSecurityGroup",
+            "Properties" : {
+                "FromPort" : 5432,
+                "IpProtocol" : "tcp",
+                "ToPort" : 5432,
+                "GroupId" : {
+                    "Ref" : "AtlasDbSecurityGroup"
+                },
+                "SourceSecurityGroupId" : {
+                    "Ref" : "AtlasAppSecurityGroup"
+                }
+            }     
+        },
+        "AtlasDbSecurityGroupEgress" : {
+            "Type" : "AWS::EC2::SecurityGroupEgress",
+            "Properties" : {
+                "CidrIp" : "0.0.0.0/0",
+                "IpProtocol" : "-1",
+                "GroupId" : {
+                    "Ref" : "AtlasDbSecurityGroup"
+                }
+            }
+        },
+        "AtlasNetworkAclIngressEntry" : {
+            "Type" : "AWS::EC2::NetworkAclEntry",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "CidrBlock" : "0.0.0.0/0",
+                "Egress" : false,
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "Protocol" : -1,
+                "RuleAction" : "allow",
+                "RuleNumber" : 100
+              }
+        },
+        "AtlasNetworkAclEgressEntry" : {
+            "Type" : "AWS::EC2::NetworkAclEntry",
+            "DependsOn" : "AtlasVpc",
+            "Properties" : {
+                "CidrBlock" : "0.0.0.0/0",
+                "Egress" : false,
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "Protocol" : -1,
+                "RuleAction" : "allow",
+                "RuleNumber" : 100
+            }
+        },
+        "AtlasPubSubnetZone1NetworkAclAssociation" : {
+            "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties" : {
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasPubSubnetZone1"
+                }
+            }
+        },
+        "AtlasAppSubnetZone1NetworkAclAssociation" : {
+            "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties" : {
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasAppSubnetZone1"
+                }
+            }
+        },
+        "AtlasDbSubnetZone1NetworkAclAssociation" : {
+            "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties" : {
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasDbSubnetZone1"
+                }
+            }
+        },
+        "AtlasPubSubnetZone2NetworkAclAssociation" : {
+            "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties" : {
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasPubSubnetZone2"
+                }
+            }
+        },
+        "AtlasAppSubnetZone2NetworkAclAssociation" : {
+            "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties" : {
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasAppSubnetZone2"
+                }
+            }
+        },
+        "AtlasDbSubnetZone2NetworkAclAssociation" : {
+            "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties" : {
+                "NetworkAclId" : {
+                    "Fn::GetAtt" : [
+                        "AtlasVpc",
+                        "DefaultNetworkAcl"
+                    ]
+                },
+                "SubnetId" : {
+                    "Ref" : "AtlasDbSubnetZone2"
+                }
+            }
+        }    
+    },
+    "Outputs" : {
+        "AtlasVpcId" : {
+            "Description" : "VPC Id",
+            "Value" : {
+                "Ref" : "AtlasVpc"
+            },
+            "Export" : {
+                "Name" : "AtlasVpcId"
+            }    
+        },
+        "AtlasPubSubnetIdZone1" : {
+            "Description" : "Subnet id of public subnet in AZ1",
+            "Value" : {
+                "Ref" : "AtlasPubSubnetZone1"
+            },
+            "Export" : {
+                "Name" : "AtlasPubSubnetIdZone1"
+            }    
+        },
+        "AtlasPubSubnetIdZone2" : {
+            "Description" : "Subnet id of public subnet in AZ2",
+            "Value" : {
+                "Ref" : "AtlasPubSubnetZone2"
+            },
+            "Export" : {
+                "Name" : "AtlasPubSubnetIdZone2"
+            }    
+        },
+        "AtlasAppSubnetIdZone1" : {
+            "Description" : "Subnet id of application subnet in AZ1",
+            "Value" : {
+                "Ref" : "AtlasAppSubnetZone1"
+            },
+            "Export" : {
+                "Name" : "AtlasAppSubnetIdZone1"
+            }    
+        },
+        "AtlasAppSubnetIdZone2" : {
+            "Description" : "Subnet id of application subnet in AZ2",
+            "Value" : {
+                "Ref" : "AtlasAppSubnetZone2"
+            },
+            "Export" : {
+                "Name" : "AtlasAppSubnetIdZone2"
+            }    
+        },
+        "AtlasEIPZone1AllocationId" : {
+            "Description" : "Allocation id of EIP intended to be used for NAT gateway in AZ1",
+            "Value" : {
+                "Fn::GetAtt" : [
+                    "AtlasNatGatewayEIPZone1",
+                    "AllocationId"
+                ]
+            },
+            "Export" : {
+                "Name" : "AtlasEIPZone1AllocationId"
+            }    
+        },
+        "AtlasEIPZone2AllocationId" : {
+            "Description" : "Allocation id of EIP intended to be used for NAT gateway in AZ2",
+            "Value" : {
+                "Fn::GetAtt" : [
+                    "AtlasNatGatewayEIPZone2",
+                    "AllocationId"
+                ]
+            },
+            "Export" : {
+                "Name" : "AtlasEIPZone2AllocationId"
+            }    
+        },
+        "AtlasPrivateZone1RouteTableId" : {
+            "Description" : "Route table id of private subnet route table in AZ1",
+            "Value" : {
+                "Ref" : "AtlasPrivateZone1RouteTable"
+            },
+            "Export" : {
+                "Name" : "AtlasPrivateZone1RouteTableId"
+            }    
+        },
+        "AtlasPrivateZone2RouteTableId" : {
+            "Description" : "Route table id of private subnet route table in AZ2",
+            "Value" : {
+                "Ref" : "AtlasPrivateZone2RouteTable"
+            },
+            "Export" : {
+                "Name" : "AtlasPrivateZone2RouteTableId"
+            }    
+        },
+        "AtlasPubSgId" : {
+            "Description" : "Security group id of public security group",
+            "Value" : {
+                "Ref" : "AtlasPubSecurityGroup"
+            },
+            "Export" : {
+                "Name" : "AtlasPubSgId"
+            }    
+        },
+        "AtlasAppSgId" : {
+            "Description" : "Security group id of application services security group",
+            "Value" : {
+                "Ref" : "AtlasAppSecurityGroup"
+            },
+            "Export" : {
+                "Name" : "AtlasAppSgId"
+            }    
+        }, 
+        "AtlasDbSgId" : {
+            "Description" : "Security group id of database security group",
+            "Value" : {
+                "Ref" : "AtlasDbSecurityGroup"
+            },
+            "Export" : {
+                "Name" : "AtlasDbSgId"
+            }    
+        }
+    }
+}
+  

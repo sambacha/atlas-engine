@@ -1,0 +1,24 @@
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: ${TLS_KEYSTORE}
+    key-store-password: ${TLS_KEYSTORE_PASSWORD}
+    key-store-type: PKCS12
+
+spring:
+  application:
+    name: atlas-config
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${git_uri}
+          timeout: 30
+          force-pull: true
+          username: ${git_user}
+          password: ${git_password}
+  
+logging:
+  level:
+    root: INFO

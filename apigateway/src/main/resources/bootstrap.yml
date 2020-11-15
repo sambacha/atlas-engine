@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: atlas-apigateway
+  profiles:
+    active: ${spring_profiles:localhost}
+  cloud:
+    config:
+      uri: ${config_server_uri:http://127.0.0.1:8888}
+      fail-fast: true
+      timeout: 20
+      retry:
+        max-attempts: 10
+      label: master

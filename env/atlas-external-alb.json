@@ -1,0 +1,67 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Resources" : {
+        "ExternalAlb" : {
+            "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties" : {
+                "IpAddressType" : "ipv4",
+                "Name" : "atlas-external-alb",
+                "Scheme" : "internet-facing",
+                "Subnets" : [ { 
+                    "Fn::ImportValue" :  {
+                        "Fn::Sub": "AtlasPubSubnetIdZone1" 
+                    }
+                }, { 
+                    "Fn::ImportValue" :  {
+                        "Fn::Sub": "AtlasPubSubnetIdZone2" 
+                    }
+                } ],
+                "Type" : "network",
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "atlas-external-alb"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs" : {
+        "ExternalAlbDnsName" : {
+            "Description" : "DNS name of the external ALB atlas-external-alb",
+            "Value" : {
+                "Fn::GetAtt" : [
+                    "ExternalAlb",
+                    "DNSName"
+                ]
+            },
+            "Export" : {
+                "Name" : "AtlasExternalAlbDnsName"
+            }    
+        },
+        "ExternalAlbArn" : {
+            "Description" : "ARN of the external ALB atlas-external-alb",
+            "Value" : {
+                "Ref" : "ExternalAlb"
+            },
+            "Export" : {
+                "Name" : "AtlasExternalAlbArn" 
+            }   
+        },
+        "ExternalAlbHostedZoneId" : {
+            "Description" : "Hosted zone id of the external ALB atlas-external-alb",
+            "Value" : {
+                "Fn::GetAtt" : [
+                    "ExternalAlb",
+                    "CanonicalHostedZoneID"
+                ]
+            },
+            "Export" : {
+                "Name" : "AtlasExternalAlbHostedZoneId" 
+            }   
+        }
+    }
+}

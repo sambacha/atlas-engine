@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: atlas-orderbook
+  profiles:
+    active: ${spring_profiles}
+  cloud:
+    config:
+      uri: ${config_server_uri}
+      fail-fast: false
+      timeout: 10
+      retry:
+        max-attempts: 10
+      label: master
+      

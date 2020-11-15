@@ -1,0 +1,230 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Parameters": {
+        "KeyName": {
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+            "Type": "String"
+        },
+        "DockerUsername": {
+            "Description": "Dockerhub username for pulling docker images for the services",
+            "Type": "String"
+        },
+        "ConfigGitUri": {
+            "Description": "git uri for configuration files",
+            "Type": "String"
+        },
+        "ConfigGitUsername": {
+            "Description": "Username for the uri declared in ConfigGitUri",
+            "Type": "String"
+        },
+        "ConfigGitPassword": {
+            "Description": "Password for the uri declared in ConfigGitUri",
+            "Type": "String"
+        }
+
+    },    
+    "Mappings": {
+        "RegionToAMIMap": {
+            "us-east-1": {
+                "AMI": "ami-0323c3dd2da7fb37d"
+            },
+            "us-east-2": {
+                "AMI": "ami-0f7919c33c90f5b58"
+            },
+            "us-west-1": {
+                "AMI": "ami-06fcc1f0bc2c8943f"
+            },
+            "us-west-2": {
+                "AMI": "ami-0d6621c01e8c2de2c"
+            }
+        }
+    },
+    "Resources" : {
+        "AtlasConfigSvcZone1" : {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "AvailabilityZone" : {
+                    "Fn::Join" : [ "", [
+                        {
+                            "Ref" : "AWS::Region"
+                        },
+                        "a"
+                    ] 
+                ]
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionToAMIMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "AMI"
+                    ]
+                },          
+                "KeyName" : { 
+                    "Ref" : "KeyName"
+                },
+                "SecurityGroupIds" : [{ 
+                    "Fn::ImportValue" :  {
+                        "Fn::Sub": "AtlasAppSgId" 
+                    }
+                } ], 
+                "SubnetId" : { 
+                    "Fn::ImportValue" :  {
+                        "Fn::Sub": "AtlasAppSubnetIdZone1" 
+                    }
+                },
+                "InstanceType" : "t2.micro",
+                "IamInstanceProfile" : "AdminAccess",
+                "Tags" : [ { 
+                        "Key" : "Name",
+                        "Value" : "atlas-config-svc-zone1"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ],
+                "UserData" : {
+                    "Fn::Base64" : {
+                        "Fn::Join" : [
+                            "",
+                            [
+                                "#!/bin/bash -ex", "\n",
+                                "yum update -y", "\n",
+                                "yum install docker -y", "\n",
+                                "systemctl start docker", "\n",
+                                "systemctl enable docker", "\n",
+                                "usermod -aG docker ec2-user", "\n",
+                                "yum install gcc -y", "\n",
+                                "yum install python-pip -y", "\n",
+                                "yum install postgresql-devel python-devel -y", "\n",
+                                "pip install pgcli==2.2.0", "\n",
+                                "docker pull ",
+                                { "Ref" : "DockerUsername" },
+                                "/atlas-config-server:latest", "\n",
+                                "mkdir ~ec2-user/atlas-security", "\n",
+                                "aws s3 cp s3://atlas-security/atlas-config.p12 ~ec2-user/atlas-security/keystore.p12", "\n",
+                                "aws s3 cp s3://atlas-security/config.txt ~ec2-user/atlas-security/keystore-pass.txt", "\n",
+                                "aws s3 cp s3://atlas-security/internal-ca.crt ~ec2-user/atlas-security/", "\n",
+                                "chown -R ec2-user ~ec2-user/atlas-security", "\n",
+                                "chgrp -R ec2-user ~ec2-user/atlas-security", "\n",
+                                "chmod 700 ~ec2-user/atlas-security", "\n",
+                                "chmod 600 ~ec2-user/atlas-security/keystore.p12", "\n",
+                                "chmod 600 ~ec2-user/atlas-security/keystore-pass.txt", "\n",
+                                "chmod 600 ~ec2-user/atlas-security/internal-ca.crt", "\n",
+                                "echo \"docker run -d -v /home/ec2-user/atlas-security:/atlas-security -p 443:8443 ",
+                                "-e TLS_KEYSTORE=/atlas-security/keystore.p12 ",
+                                "-e TLS_KEYSTORE_PASSWORD=`cat  /home/ec2-user/atlas-security/keystore-pass.txt` ",
+                                "-e git_uri=", 
+                                { "Ref" : "ConfigGitUri" }, 
+                                " -e git_user=", 
+                                { "Ref" : "ConfigGitUsername" }, 
+                                " -e git_password=", 
+                                { "Ref" : "ConfigGitPassword" }, 
+                                " --name atlas-config ",
+                                { "Ref" : "DockerUsername" },
+                                "/atlas-config-server:latest\" >> ~ec2-user/run-config-svc.sh", "\n",
+                                "chown ec2-user ~ec2-user/run-config-svc.sh", "\n",
+                                "chgrp ec2-user ~ec2-user/run-config-svc.sh", "\n",
+                                "chmod 755 ~ec2-user/run-config-svc.sh", "\n",
+                                "~ec2-user/run-config-svc.sh", "\n",
+                                "\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },    
+        "AtlasConfigSvcZone1DNSRecord" : {
+            "Type" : "AWS::Route53::RecordSet",
+            "Properties" : {
+                "HostedZoneId" : {
+                    "Fn::ImportValue" :  {
+                        "Fn::Sub": "AtlasPrivateHostedZoneId" 
+                    }
+                },
+                "Name" : "i1.config.atlas.com",
+                "ResourceRecords" : [
+                   {
+                        "Fn::GetAtt" : [
+                            "AtlasConfigSvcZone1",
+                            "PrivateIp"
+                        ]    
+                   }
+                ],
+                "TTL" : "300",
+                "Type" : "A"
+             }
+        },
+        "AtlasConfigSvcTargetGrp" : {
+            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "DependsOn" : "AtlasConfigSvcZone1",
+            "Properties" : {
+                "HealthCheckEnabled" : true,
+                "HealthCheckIntervalSeconds" : 30,
+                "HealthCheckPath" : "/actuator/health",
+                "HealthCheckPort" : "443",
+                "HealthCheckProtocol" : "HTTPS",
+                "HealthCheckTimeoutSeconds" : 5,
+                "HealthyThresholdCount" : 5,
+                "Matcher" : {
+                    "HttpCode" : "200"
+                },
+                "Name" : "config-svc-grp",
+                "Port" : 443,
+                "Protocol" : "HTTPS",
+                "Tags" : [
+                    {
+                        "Key" : "Name",
+                        "Value" : "config-svc-grp"
+                    }, {
+                        "Key" : "Cloudformation",
+                        "Value" : "Yes"
+                    }
+                ],
+                "Targets" : [ {
+                    "Id" : { "Ref" : "AtlasConfigSvcZone1" },
+                    "Port" : 443
+                } ],
+                "TargetType" : "instance",
+                "UnhealthyThresholdCount" : 2,
+                "VpcId" : { 
+                    "Fn::ImportValue" :  {
+                        "Fn::Sub": "AtlasVpcId" 
+                    } 
+                }
+            }
+        }, 
+        "InternalAlbListnerConfigSvcRule" : {
+            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn" : "AtlasConfigSvcTargetGrp",
+            "Properties" : {
+                "Actions" : [ {
+                    "ForwardConfig" : {
+                        "TargetGroups" : [ {
+                            "TargetGroupArn" : { 
+                                "Ref" : "AtlasConfigSvcTargetGrp"                            
+                            }
+                        } ]
+                    },
+                    "Type" : "forward"
+                } ],
+                "Conditions" : [ {
+                    "Field" : "path-pattern",
+                    "PathPatternConfig" : {
+                        "Values" : [
+                            "/atlas-*/aws/master"
+                        ]
+                    }
+                } ],
+                "ListenerArn" : { 
+                    "Fn::ImportValue" :  {
+                        "Fn::Sub": "InternalAlbListenerArn" 
+                    } 
+                },
+                "Priority" : 1
+            }
+        }    
+    }
+}
+

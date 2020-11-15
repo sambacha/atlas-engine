@@ -1,0 +1,41 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Parameters": {
+        "DNSHostedZoneId": {
+            "Description": "Route 53 hosted zone id",
+            "Type": "String"
+        },
+        "AtlasURL" : {
+            "Description" : "URL for which a DNS record is to be created",
+            "Type" : "String"
+        }
+    },    
+    "Resources" : {
+        "AtlasDnsRecord" : {
+            "Type" : "AWS::Route53::RecordSet",
+            "Properties" : {
+                "AliasTarget" : {
+                    "DNSName" : {
+                        "Fn::ImportValue" :  {
+                            "Fn::Sub": "AtlasExternalAlbDnsName" 
+                        }
+                    },
+                    "EvaluateTargetHealth" : false,
+                    "HostedZoneId" : {
+                        "Fn::ImportValue" :  {
+                            "Fn::Sub": "AtlasExternalAlbHostedZoneId" 
+                        }
+                    }
+                },
+                "HostedZoneId" : { 
+                    "Ref" : "DNSHostedZoneId"
+                },
+                "Comment" : "Alias record to the atlas-external-alb",
+                "Name" : { 
+                    "Ref" : "AtlasURL"
+                },
+                "Type" : "A"
+            }
+        }
+    }
+}

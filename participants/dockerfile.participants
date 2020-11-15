@@ -1,0 +1,16 @@
+FROM hengine/atlas-base-osjdk:latest
+
+RUN touch /firststart.txt
+
+ADD target/financial-exchange-participants-0.0.1-SNAPSHOT.jar /
+
+EXPOSE 8443/tcp
+
+WORKDIR /
+ENTRYPOINT cd / && \
+if [ -f /firststart.txt ]; then \
+keytool -import -noprompt -trustcacerts -alias internalca -cacerts -file /atlas-security/internal-ca.crt -storepass changeit; \
+rm /firststart.txt; \
+else echo 'Cert already imported'; fi && \
+java -jar ./financial-exchange-participants-0.0.1-SNAPSHOT.jar
+
