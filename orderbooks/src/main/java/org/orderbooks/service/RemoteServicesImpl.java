@@ -56,7 +56,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		boolean updatedTrade = false;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/trade/");
+			stringBuffer.append("/atlas/internal/api/trade/");
 			String serviceUrl = stringBuffer.toString();
 			System.out.println("saveTrade service url: " + serviceUrl);
 			
@@ -78,7 +78,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		String symbol = null;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/product/equity/");
+			stringBuffer.append("/atlas/internal/api/product/equity/");
 			stringBuffer.append(productId);
 			String serviceUrl = stringBuffer.toString(); 
 			System.out.println("The isValidProduct service url: " + serviceUrl);
@@ -120,7 +120,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		boolean updatedOrder = false;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/order/activity/");
+			stringBuffer.append("/atlas/internal/api/order/activity/");
 			stringBuffer.append(orderId);
 			String serviceUrl = stringBuffer.toString();
 			System.out.println("orderTradedQuantity service url: " + serviceUrl);
@@ -152,7 +152,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		boolean updatedOrder = false;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/order/activity/");
+			stringBuffer.append("/atlas/internal/api/order/activity/");
 			stringBuffer.append(orderId);
 			String serviceUrl = stringBuffer.toString();
 			System.out.println("orderBookedQuantity service url: " + serviceUrl);
@@ -183,7 +183,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		boolean updatedOrder = false;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/order/activity/");
+			stringBuffer.append("/atlas/internal/api/order/activity/");
 			stringBuffer.append(orderId);
 			String serviceUrl = stringBuffer.toString();
 			System.out.println("orderCancelledQuantity service url: " + serviceUrl);

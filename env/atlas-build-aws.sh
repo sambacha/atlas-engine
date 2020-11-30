@@ -11,7 +11,7 @@ function showUsage() {
     echo "                               deploy-vpc - Deploy the vpc stack, subnets, internet gateway, security groups   " >&2
     echo "                               deploy-dmz - Deploy a single publicly available EC2 instance to act as a DMZ " >&2
     echo "                               build-services - Do maven build and docker build for all services   " >&2
-    echo "                               deploy-services - only build & deploy stacks that includes finex services  " >&2
+    echo "                               deploy-services - only build & deploy stacks that includes atlas services  " >&2
     echo "                                          infrasturcture incuding load balancers & options DNS mapping. " >&2     
     echo "                                          Assumes the vpc stack is already built as services stack will " >&2 
     echo "                                          use exported references from the vpc stack" >&2 
@@ -23,7 +23,7 @@ function showUsage() {
     echo "                               Directory containing the required cloudformation json files  " >&2
     echo "  "  >&2
     echo "               -s path-to-source-code Required only for build-services target.   " >&2
-    echo "                               Base path to finex services source code  " >&2
+    echo "                               Base path to atlas services source code  " >&2
     echo "  "  >&2
     echo "               -t build base OS and JDK image? Optional and applies only for build-services target.   " >&2
     echo "                               Should the build-services build the base OS with JDK docker image?  " >&2
@@ -43,10 +43,10 @@ function showUsage() {
     echo "               -k aws-keypair-name  Required only for deploy-services or deploy-dmz target" >&2
     echo "  "  >&2
     echo "               -d aws-route53-hosted-zone-id  optional" >&2
-    echo "                               If present, will create DNS record to finex services external api  " >&2
+    echo "                               If present, will create DNS record to atlas services external api  " >&2
     echo "  "  >&2
     echo "               -f public-url-for-dns-record  optional" >&2
-    echo "                               Example: finex.mydomain.com  If present, will map this url in the DNS record to finex services external api  " >&2
+    echo "                               Example: atlas.mydomain.com  If present, will map this url in the DNS record to atlas services external api  " >&2
     echo "   " >&2
 }
 
@@ -134,7 +134,7 @@ fi
 if [[ "$FINEX_BUILD_TARGET" == "build-services" ]]; then
     if [[ -z "$PATH_TO_SOURCE_CODE" ]]; then
         VALID_ARGUMENTS="false"
-        echo "Missing path to the directory containing finex services source code"
+        echo "Missing path to the directory containing atlas services source code"
     fi
     if [[ -z "$FINEX_DOCKER_USERNAME" ]]; then
         VALID_ARGUMENTS="false"

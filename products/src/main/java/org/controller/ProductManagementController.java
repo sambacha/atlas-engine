@@ -32,7 +32,7 @@ public class ProductManagementController {
 	@Qualifier("productManagementServiceImpl")
 	private ProductManagementService productManagmentService;
 		
-	@PostMapping(value = "/finex/internal/api/product/equity", produces = "application/json", consumes = "application/json")
+	@PostMapping(value = "/atlas/internal/api/product/equity", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Long> addEquity(@RequestBody ProductEntry productEntry)  {
 		APIDataResponse<Long> response = new APIDataResponse<>();
 		try {
@@ -51,7 +51,7 @@ public class ProductManagementController {
 		return response;
 	}
 	 
-	@PutMapping(value = "/finex/internal/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
+	@PutMapping(value = "/atlas/internal/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Equity> updateEquity(@PathVariable("productId") long productId,
 			@RequestBody ProductEntry productEntry)  {
 		APIDataResponse<Equity> response = new APIDataResponse<>();
@@ -71,31 +71,31 @@ public class ProductManagementController {
 		return response;
 	}
 
-	@GetMapping(value = "/finex/internal/api/product/equity", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/internal/api/product/equity", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Equity> getEquityBySymbolInternal(@RequestParam("symbol") String symbol)  {
 		APIDataResponse<Equity> response = getEquityBySymbolImpl(symbol);
 		return response;
 	}
 
-	@GetMapping(value = "/finex/api/product/equity", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/api/product/equity", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Equity> getEquityBySymbolPublic(@RequestParam("symbol") String symbol)  {
 		APIDataResponse<Equity> response = getEquityBySymbolImpl(symbol);
 		return response;
 	}
 
-	@GetMapping(value = "/finex/internal/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/internal/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Equity> getEquityByProudctIdInternal(@PathVariable("productId") long productId)  {
 		APIDataResponse<Equity> response = getEquityByProductIdImpl(productId);
 		return response;
 	}
 
-	@GetMapping(value = "/finex/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Equity> getEquityByProudctIdPublic(@PathVariable("productId") long productId)  {
 		APIDataResponse<Equity> response = getEquityByProductIdImpl(productId);
 		return response;
 	}
 
-	@DeleteMapping(value = "/finex/internal/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
+	@DeleteMapping(value = "/atlas/internal/api/product/equity/{productId}", produces = "application/json", consumes = "application/json")
 	public APIResponse deleteEquity(@PathVariable("productId") long productId)  {
 		APIResponse response = new APIResponse();
 		try {

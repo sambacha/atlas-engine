@@ -1,278 +1,324 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Parameters": {
-        "KeyName": {
-            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-            "Type": "String"
-        },
-        "DockerUsername": {
-            "Description": "Dockerhub username for pulling docker images for the services",
-            "Type": "String"
-        },
-        "CertificateArn": {
-            "Description": "ARN of the certificate in ACM for the load balancer",
-            "Type": "String"
-        }
-    },    
-    "Mappings": {
-        "RegionToAMIMap": {
-            "us-east-1": {
-                "AMI": "ami-0323c3dd2da7fb37d"
-            },
-            "us-east-2": {
-                "AMI": "ami-0f7919c33c90f5b58"
-            },
-            "us-west-1": {
-                "AMI": "ami-06fcc1f0bc2c8943f"
-            },
-            "us-west-2": {
-                "AMI": "ami-0d6621c01e8c2de2c"
-            }
-        }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "KeyName": {
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "String"
     },
-    "Resources" : {
-        "AtlasApiGatewaySvcZone1" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : {
-                    "Fn::Join" : [ "", [
-                        {
-                            "Ref" : "AWS::Region"
-                        },
-                        "a"
-                    ] 
-                ]
-                },
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "RegionToAMIMap",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "AMI"
-                    ]
-                },          
-                "KeyName" : { 
-                    "Ref" : "KeyName"
-                },
-                "SecurityGroupIds" : [{ 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasAppSgId" 
-                    }
-                } ], 
-                "SubnetId" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasAppSubnetIdZone1" 
-                    }
-                },
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-apigateway-svc-zone1"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli==2.2.0", "\n",
-                                "docker pull ",
-                                { "Ref" : "DockerUsername" },
-                                "/atlas-apigateway-aws:latest", "\n",
-                                "mkdir ~ec2-user/atlas-security", "\n",
-                                "aws s3 cp s3://atlas-security/atlas-apigateway.p12 ~ec2-user/atlas-security/keystore.p12", "\n",
-                                "aws s3 cp s3://atlas-security/apigateway.txt ~ec2-user/atlas-security/keystore-pass.txt", "\n",
-                                "aws s3 cp s3://atlas-security/internal-ca.crt ~ec2-user/atlas-security/", "\n",
-                                "chown -R ec2-user ~ec2-user/atlas-security", "\n",
-                                "chgrp -R ec2-user ~ec2-user/atlas-security", "\n",
-                                "chmod 700 ~ec2-user/atlas-security", "\n",
-                                "chmod 600 ~ec2-user/atlas-security/keystore.p12", "\n",
-                                "chmod 600 ~ec2-user/atlas-security/keystore-pass.txt", "\n",
-                                "chmod 600 ~ec2-user/atlas-security/internal-ca.crt", "\n",
-                                "echo \"#!/bin/bash\" >>  ~ec2-user/run-apigateway-svc.sh", "\n",
-                                "echo \"docker run -d -v /home/ec2-user/atlas-security:/atlas-security -p 443:8443 ",
-                                "-e TLS_KEYSTORE=/atlas-security/keystore.p12 ",
-                                "-e TLS_KEYSTORE_PASSWORD=`cat  /home/ec2-user/atlas-security/keystore-pass.txt` ",
-                                "-e spring_profiles=aws ",
-                                "-e config_server_uri=https://", 
-                                { "Fn::ImportValue" :  { "Fn::Sub": "AtlasInternalAlbDnsName"  } }, " ",
-                                "-e FINEX_DISCOVERY_URI=https://",
-                                { "Fn::ImportValue" :  { "Fn::Sub": "AtlasInternalAlbDnsName"  } }, "/eureka ",
-                                "-e FINEX_DISCOVERY_CLIENT_HOSTNAME=i1.apigateway.atlas.com ",
-                                "--name atlas-apigateway ", 
-                                { "Ref" : "DockerUsername" },
-                                "/atlas-apigateway-aws:latest\" >> ~ec2-user/run-apigateway-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-apigateway-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-apigateway-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-apigateway-svc.sh", "\n",
-                                "~ec2-user/run-apigateway-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-        "AtlasApiGatewaySvcZone1DNSRecord" : {
-            "Type" : "AWS::Route53::RecordSet",
-            "Properties" : {
-                "HostedZoneId" : {
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasPrivateHostedZoneId" 
-                    }
-                },
-                "Name" : "i1.apigateway.atlas.com",
-                "ResourceRecords" : [
-                   {
-                        "Fn::GetAtt" : [
-                            "AtlasApiGatewaySvcZone1",
-                            "PrivateIp"
-                        ]    
-                   }
-                ],
-                "TTL" : "300",
-                "Type" : "A"
-             }
-        },
-        "IntApiGatewaySvcTargetGrp" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn" : "AtlasApiGatewaySvcZone1",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckIntervalSeconds" : 30,
-                "HealthCheckPath" : "/actuator/health",
-                "HealthCheckPort" : "443",
-                "HealthCheckProtocol" : "HTTPS",
-                "HealthCheckTimeoutSeconds" : 5,
-                "HealthyThresholdCount" : 5,
-                "Matcher" : {
-                    "HttpCode" : "200"
-                },
-                "Name" : "int-apigateway-svc-grp",
-                "Port" : 443,
-                "Protocol" : "HTTPS",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "int-apigateway-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { "Ref" : "AtlasApiGatewaySvcZone1" },
-                    "Port" : 443
-                } ],
-                "TargetType" : "instance",
-                "UnhealthyThresholdCount" : 2,
-                "VpcId" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasVpcId" 
-                    } 
-                }
-            }
-        }, 
-        "InternalAlbListnerApiSvcRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "IntApiGatewaySvcTargetGrp",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : { 
-                                "Ref" : "IntApiGatewaySvcTargetGrp"                            
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                } ],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/internal/api/*",
-                            "/atlas/api/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "InternalAlbListenerArn" 
-                    } 
-                },
-                "Priority" : 3
-            }
-        },
-        "ExtApiGatewaySvcTargetGrp" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckProtocol" : "TCP",
-                "Name" : "ext-apigateway-svc-grp",
-                "Port" : 443,
-                "Protocol" : "TLS",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "ext-apigateway-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { "Ref" : "AtlasApiGatewaySvcZone1" },
-                    "Port" : 443
-                } ],
-                "TargetType" : "instance",
-                "VpcId" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasVpcId" 
-                    } 
-                }
-            }
-        },
-        "ExternalAlbListener" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::Listener",
-            "DependsOn" : "ExtApiGatewaySvcTargetGrp",
-            "Properties" : {
-                "Certificates" : [ {
-                    "CertificateArn" : { "Ref" : "CertificateArn" }
-                }
-            ],
-            "LoadBalancerArn" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasExternalAlbArn" 
-                    } 
-                },
-                "DefaultActions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : { 
-                                "Ref" : "ExtApiGatewaySvcTargetGrp"                            
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                } ],
-                "Port" : 443,
-                "Protocol" : "TLS"
-            }
-        }
+    "DockerUsername": {
+      "Description": "Dockerhub username for pulling docker images for the services",
+      "Type": "String"
+    },
+    "CertificateArn": {
+      "Description": "ARN of the certificate in ACM for the load balancer",
+      "Type": "String"
     }
+  },
+  "Mappings": {
+    "RegionToAMIMap": {
+      "us-east-1": {
+        "AMI": "ami-0323c3dd2da7fb37d"
+      },
+      "us-east-2": {
+        "AMI": "ami-0f7919c33c90f5b58"
+      },
+      "us-west-1": {
+        "AMI": "ami-06fcc1f0bc2c8943f"
+      },
+      "us-west-2": {
+        "AMI": "ami-0d6621c01e8c2de2c"
+      }
+    }
+  },
+  "Resources": {
+    "AtlasApiGatewaySvcZone1": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region"
+              },
+              "a"
+            ]
+          ]
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "RegionToAMIMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "AMI"
+          ]
+        },
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "SecurityGroupIds": [
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": "AtlasAppSgId"
+            }
+          }
+        ],
+        "SubnetId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasAppSubnetIdZone1"
+          }
+        },
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-apigateway-svc-zone1"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli==2.2.0",
+                "\n",
+                "docker pull ",
+                { "Ref": "DockerUsername" },
+                "/atlas-apigateway-aws:latest",
+                "\n",
+                "mkdir ~ec2-user/atlas-security",
+                "\n",
+                "aws s3 cp s3://atlas-security/atlas-apigateway.p12 ~ec2-user/atlas-security/keystore.p12",
+                "\n",
+                "aws s3 cp s3://atlas-security/apigateway.txt ~ec2-user/atlas-security/keystore-pass.txt",
+                "\n",
+                "aws s3 cp s3://atlas-security/internal-ca.crt ~ec2-user/atlas-security/",
+                "\n",
+                "chown -R ec2-user ~ec2-user/atlas-security",
+                "\n",
+                "chgrp -R ec2-user ~ec2-user/atlas-security",
+                "\n",
+                "chmod 700 ~ec2-user/atlas-security",
+                "\n",
+                "chmod 600 ~ec2-user/atlas-security/keystore.p12",
+                "\n",
+                "chmod 600 ~ec2-user/atlas-security/keystore-pass.txt",
+                "\n",
+                "chmod 600 ~ec2-user/atlas-security/internal-ca.crt",
+                "\n",
+                "echo \"#!/bin/bash\" >>  ~ec2-user/run-apigateway-svc.sh",
+                "\n",
+                "echo \"docker run -d -v /home/ec2-user/atlas-security:/atlas-security -p 443:8443 ",
+                "-e TLS_KEYSTORE=/atlas-security/keystore.p12 ",
+                "-e TLS_KEYSTORE_PASSWORD=`cat  /home/ec2-user/atlas-security/keystore-pass.txt` ",
+                "-e spring_profiles=aws ",
+                "-e config_server_uri=https://",
+                { "Fn::ImportValue": { "Fn::Sub": "AtlasInternalAlbDnsName" } },
+                " ",
+                "-e FINEX_DISCOVERY_URI=https://",
+                { "Fn::ImportValue": { "Fn::Sub": "AtlasInternalAlbDnsName" } },
+                "/eureka ",
+                "-e FINEX_DISCOVERY_CLIENT_HOSTNAME=i1.apigateway.atlas.com ",
+                "--name atlas-apigateway ",
+                { "Ref": "DockerUsername" },
+                "/atlas-apigateway-aws:latest\" >> ~ec2-user/run-apigateway-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-apigateway-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-apigateway-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-apigateway-svc.sh",
+                "\n",
+                "~ec2-user/run-apigateway-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AtlasApiGatewaySvcZone1DNSRecord": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasPrivateHostedZoneId"
+          }
+        },
+        "Name": "i1.apigateway.atlas.com",
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": ["AtlasApiGatewaySvcZone1", "PrivateIp"]
+          }
+        ],
+        "TTL": "300",
+        "Type": "A"
+      }
+    },
+    "IntApiGatewaySvcTargetGrp": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "DependsOn": "AtlasApiGatewaySvcZone1",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/actuator/health",
+        "HealthCheckPort": "443",
+        "HealthCheckProtocol": "HTTPS",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 5,
+        "Matcher": {
+          "HttpCode": "200"
+        },
+        "Name": "int-apigateway-svc-grp",
+        "Port": 443,
+        "Protocol": "HTTPS",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "int-apigateway-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": { "Ref": "AtlasApiGatewaySvcZone1" },
+            "Port": 443
+          }
+        ],
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 2,
+        "VpcId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasVpcId"
+          }
+        }
+      }
+    },
+    "InternalAlbListnerApiSvcRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "IntApiGatewaySvcTargetGrp",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "IntApiGatewaySvcTargetGrp"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/internal/api/*", "/atlas/api/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "InternalAlbListenerArn"
+          }
+        },
+        "Priority": 3
+      }
+    },
+    "ExtApiGatewaySvcTargetGrp": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckProtocol": "TCP",
+        "Name": "ext-apigateway-svc-grp",
+        "Port": 443,
+        "Protocol": "TLS",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ext-apigateway-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": { "Ref": "AtlasApiGatewaySvcZone1" },
+            "Port": 443
+          }
+        ],
+        "TargetType": "instance",
+        "VpcId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasVpcId"
+          }
+        }
+      }
+    },
+    "ExternalAlbListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "DependsOn": "ExtApiGatewaySvcTargetGrp",
+      "Properties": {
+        "Certificates": [
+          {
+            "CertificateArn": { "Ref": "CertificateArn" }
+          }
+        ],
+        "LoadBalancerArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasExternalAlbArn"
+          }
+        },
+        "DefaultActions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "ExtApiGatewaySvcTargetGrp"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Port": 443,
+        "Protocol": "TLS"
+      }
+    }
+  }
 }

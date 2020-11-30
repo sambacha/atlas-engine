@@ -1,0 +1,20 @@
+{
+  "name": "atlas-engine",
+  "version": "1.0.0",
+  "description": "atlas exchange engine",
+  "main": "index.json",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sambacha/atlas-engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sambacha/atlas-engine/issues"
+  },
+  "homepage": "https://github.com/sambacha/atlas-engine#readme"
+}

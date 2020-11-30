@@ -36,7 +36,7 @@ public class OrderManagementController {
 	@Qualifier("asyncExecPosRecorder")
 	private ExecPosRecorder execPosRecorder;
 
-	@PostMapping(value = "/finex/api/order", produces = "application/json", consumes = "application/json")
+	@PostMapping(value = "/atlas/api/order", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Long> acceptNewOrder(@RequestBody OrderEntry orderEntry) {
 		execPosRecorder.recordExecutionPoint(className, "acceptNewOrder", -1, "entry");
 		logger.trace("Entering acceptNewOrder for POST on /order");
@@ -61,7 +61,7 @@ public class OrderManagementController {
 		return response;
 	} 
 	
-	@PutMapping(value = "/finex/api/order/{orderId}", produces = "application/json", consumes = "application/json")
+	@PutMapping(value = "/atlas/api/order/{orderId}", produces = "application/json", consumes = "application/json")
 	public APIResponse updateOrder(@PathVariable("orderId") long orderId,
 			@RequestBody OrderEntry orderEntry) {
 		execPosRecorder.recordExecutionPoint(className, "updateOrder", orderId, "entry");
@@ -83,7 +83,7 @@ public class OrderManagementController {
 
 	} 
 	
-	@PutMapping(value = "/finex/internal/api/order/activity/{orderId}", produces = "application/json", consumes = "application/json")
+	@PutMapping(value = "/atlas/internal/api/order/activity/{orderId}", produces = "application/json", consumes = "application/json")
 	public APIResponse updateOrderTrade(@PathVariable("orderId") long orderId,
 			@RequestBody OrderActivityEntry orderActivityEntry) {
 		execPosRecorder.recordExecutionPoint(className, "updateOrderTrade", orderId, "entry");
@@ -106,7 +106,7 @@ public class OrderManagementController {
 	} 
 
 
-	@GetMapping(value = "/finex/api/order/{orderId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/api/order/{orderId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<OrderReport> getOrderStatus(@PathVariable("orderId") long orderId) {
 		execPosRecorder.recordExecutionPoint(className, "getOrderStatus", orderId, "entry");
 		APIDataResponse<OrderReport> response = new APIDataResponse<>();
@@ -127,7 +127,7 @@ public class OrderManagementController {
 		return response;
 	} 
 
-	@DeleteMapping(value = "/finex/api/order/{orderId}", produces = "application/json", consumes = "application/json")
+	@DeleteMapping(value = "/atlas/api/order/{orderId}", produces = "application/json", consumes = "application/json")
 	public APIResponse deleteOrder(@PathVariable("orderId") long orderId) {
 		execPosRecorder.recordExecutionPoint(className, "deleteOrder", orderId, "entry");
 		APIResponse response = new APIResponse();

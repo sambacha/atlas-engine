@@ -18,7 +18,7 @@ spring:
           force-pull: true
           username: ${git_user}
           password: ${git_password}
-  
+
 logging:
   level:
     root: INFO

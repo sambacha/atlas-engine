@@ -56,7 +56,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		boolean validProduct = false;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/product/equity/");
+			stringBuffer.append("/atlas/internal/api/product/equity/");
 			stringBuffer.append(productId);
 			String serviceUrl = stringBuffer.toString(); 
 			System.out.println("The isValidProduct service url: " + serviceUrl);
@@ -79,7 +79,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		boolean validParticipant = false;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/participant/broker/");
+			stringBuffer.append("/atlas/internal/api/participant/broker/");
 			stringBuffer.append(participantId);
 			String serviceUrl = stringBuffer.toString();
 			System.out.println("isValidParticipant service url: " + serviceUrl);
@@ -110,7 +110,7 @@ public class RemoteServicesImpl implements RemoteServices {
 		boolean addedToBook = false;
 		try {
 			StringBuffer stringBuffer = new StringBuffer(getApiGatewayUrl());
-			stringBuffer.append("/finex/internal/api/orderBook/order/");
+			stringBuffer.append("/atlas/internal/api/orderBook/order/");
 			String serviceUrl = stringBuffer.toString();
 			System.out.println("addOrderInBook service url: " + serviceUrl);
 

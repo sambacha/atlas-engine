@@ -11,4 +11,3 @@ spring:
       retry:
         max-attempts: 10
       label: master
-      

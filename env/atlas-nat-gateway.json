@@ -1,44 +1,45 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Resources" : {
-        "NatGatewayZone1" : {
-            "Type" : "AWS::EC2::NatGateway",
-            "Properties" : {
-                "AllocationId" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasEIPZone1AllocationId" 
-                    }
-                }, 
-                "SubnetId" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasPubSubnetIdZone1" 
-                    }
-                }, 
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-nat-zone1"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ]
-            }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "NatGatewayZone1": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasEIPZone1AllocationId"
+          }
         },
-        "NatRouteZone1" : {
-            "Type" : "AWS::EC2::Route",
-            "DependsOn" : "NatGatewayZone1",
-            "Properties" : {
-                "RouteTableId" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasPrivateZone1RouteTableId" 
-                    }
-                }, 
-                "DestinationCidrBlock" : "0.0.0.0/0",
-                "NatGatewayId" : { 
-                    "Ref" : "NatGatewayZone1"
-                }
-            }
+        "SubnetId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasPubSubnetIdZone1"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-nat-zone1"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ]
+      }
+    },
+    "NatRouteZone1": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "NatGatewayZone1",
+      "Properties": {
+        "RouteTableId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasPrivateZone1RouteTableId"
+          }
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "NatGatewayZone1"
         }
+      }
     }
+  }
 }
