@@ -25,7 +25,7 @@ public class TradeManagementController {
 	@Qualifier("tradeManagementServiceImpl")
 	private TradeManagementService tradeManagmentService;
 	
-	@PostMapping(value = "/finex/internal/api/trade", produces = "application/json", consumes = "application/json")
+	@PostMapping(value = "/atlas/internal/api/trade", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Long> addTradeInternal(@RequestBody TradeEntry tradeEntry)  {
 		APIDataResponse<Long> response = new APIDataResponse<>();
 		try {
@@ -44,31 +44,31 @@ public class TradeManagementController {
 		return response;
 	}
 	 
-	@GetMapping(value = "/finex/internal/api/trade/{tradeId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/internal/api/trade/{tradeId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<TradeReport> getTradeInternal(@PathVariable("tradeId") long tradeId)  {
 		APIDataResponse<TradeReport> response = getTradeImpl(tradeId);
 		return response;
 	}
 
-	@GetMapping(value = "/finex/api/trade/{tradeId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/api/trade/{tradeId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<TradeReport> getTradePublic(@PathVariable("tradeId") long tradeId)  {
 		APIDataResponse<TradeReport> response = getTradeImpl(tradeId);
 		return response;
 	}
 
-	@GetMapping(value = "/finex/internal/api/trade/order/{orderId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/internal/api/trade/order/{orderId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<List<TradeReport>> getTradesForOrderInternal(@PathVariable("orderId") long orderId)  {
 		APIDataResponse<List<TradeReport>> response = getTradesForOrderImpl(orderId);
 		return response;
 	}
 
-	@GetMapping(value = "/finex/api/trade/order/{orderId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/api/trade/order/{orderId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<List<TradeReport>> getTradesForOrderPublic(@PathVariable("orderId") long orderId)  {
 		APIDataResponse<List<TradeReport>> response = getTradesForOrderImpl(orderId);
 		return response;
 	}
 
-	@DeleteMapping(value = "/finex/internal/api/trade/{tradeId}", produces = "application/json", consumes = "application/json")
+	@DeleteMapping(value = "/atlas/internal/api/trade/{tradeId}", produces = "application/json", consumes = "application/json")
 	public APIResponse bustTrade(@PathVariable("tradeId") long tradeId)  {
 		APIResponse response = new APIResponse();
 		try {

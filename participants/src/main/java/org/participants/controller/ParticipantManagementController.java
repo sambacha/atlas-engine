@@ -24,7 +24,7 @@ public class ParticipantManagementController {
 	@Qualifier("participantManagementServiceImpl")
 	private ParticipantManagementService participantManagmentService;
 	
-	@PostMapping(value = "/finex/internal/api/participant/broker", produces = "application/json", consumes = "application/json")
+	@PostMapping(value = "/atlas/internal/api/participant/broker", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Long> addBroker(@RequestBody ParticipantEntry participantEntry)  {
 		APIDataResponse<Long> response = new APIDataResponse<>();
 		try {
@@ -43,7 +43,7 @@ public class ParticipantManagementController {
 		return response;
 	} 
 
-	@PutMapping(value = "/finex/internal/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
+	@PutMapping(value = "/atlas/internal/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Broker> updateBroker(@PathVariable("participantId") long participantId,
 			@RequestBody ParticipantEntry participantEntry)  {
 		APIDataResponse<Broker> response = new APIDataResponse<>();
@@ -64,19 +64,19 @@ public class ParticipantManagementController {
 
 	} 
 
-	@GetMapping(value = "/finex/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Broker> getBrokerPublic(@PathVariable("participantId") long participantId)  {
 		APIDataResponse<Broker> response = getBrokerImpl(participantId);
 		return response;
 	} 
 
-	@GetMapping(value = "/finex/internal/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/internal/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<Broker> getBrokerInternal(@PathVariable("participantId") long participantId)  {
 		APIDataResponse<Broker> response = getBrokerImpl(participantId);
 		return response;
 	} 
 
-	@DeleteMapping(value = "/finex/internal/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
+	@DeleteMapping(value = "/atlas/internal/api/participant/broker/{participantId}", produces = "application/json", consumes = "application/json")
 	public APIResponse deleteBroker(@PathVariable("participantId") long participantId)  {
 		APIResponse response = new APIResponse();
 		try {

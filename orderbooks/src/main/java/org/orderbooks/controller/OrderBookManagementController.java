@@ -34,7 +34,7 @@ public class OrderBookManagementController {
 	@Qualifier("asyncExecPosRecorder")
 	private ExecPosRecorder execPosRecorder;
 	
-	@PostMapping(value = "/finex/internal/api/orderBook/order", produces = "application/json", consumes = "application/json")
+	@PostMapping(value = "/atlas/internal/api/orderBook/order", produces = "application/json", consumes = "application/json")
 	public APIResponse acceptNewOrder(@RequestBody OrderBookEntry orderBookEntry) {
 		logger.trace("Entering acceptNewOrder: " + orderBookEntry);
 		//kLogger.trace("KafkaLog Entering OrderBookService acceptNewOrder");
@@ -58,7 +58,7 @@ public class OrderBookManagementController {
 
 	} 
 	
-	@GetMapping(value = "/finex/internal/api/orderBook/{productId}", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/atlas/internal/api/orderBook/{productId}", produces = "application/json", consumes = "application/json")
 	public APIDataResponse<OrderBookState> getOrderBook(@PathVariable("productId") long productId) {
 		APIDataResponse<OrderBookState> response = new APIDataResponse<>();
 		try {
@@ -75,7 +75,7 @@ public class OrderBookManagementController {
 
 	} 
 
-	@DeleteMapping(value = "/finex/internal/api/orderBook/{orderId}", produces = "application/json", consumes = "application/json")
+	@DeleteMapping(value = "/atlas/internal/api/orderBook/{orderId}", produces = "application/json", consumes = "application/json")
 	public APIResponse deleteOrder(@PathVariable("orderId") long orderId, @RequestParam long productId) {
 		APIResponse response = new APIResponse();
 		try {
