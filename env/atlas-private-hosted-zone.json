@@ -1,41 +1,41 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Resources" : {
-        "AtlasPrivateHostedZone" : {
-            "Type" : "AWS::Route53::HostedZone",
-            "Properties": {
-                "HostedZoneConfig": {
-                   "Comment": "Private hosted zone for internal DNS for atlas services"
-                },
-                "Name": "atlas.com",
-                "VPCs": [ 
-                    {
-                        "VPCId": { 
-                            "Fn::ImportValue" :  {
-                                "Fn::Sub": "AtlasVpcId" 
-                            }
-                        },
-                        "VPCRegion": { "Ref" : "AWS::Region" }
-                    }
-                ],
-                "HostedZoneTags": [
-                   {
-                      "Key": "ZoneName",
-                      "Value": "AtlasInternalHostedZone"
-                   }
-                ]
-             }       
-        }
-    },
-    "Outputs" : {
-        "AtlasPrivateHostedZoneId" : {
-            "Description" : "Atlas private hosted zone id for atlas.com",
-            "Value" : {
-                "Ref" : "AtlasPrivateHostedZone"
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "AtlasPrivateHostedZone": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "HostedZoneConfig": {
+          "Comment": "Private hosted zone for internal DNS for atlas services"
+        },
+        "Name": "atlas.com",
+        "VPCs": [
+          {
+            "VPCId": {
+              "Fn::ImportValue": {
+                "Fn::Sub": "AtlasVpcId"
+              }
             },
-            "Export" : {
-                "Name" : "AtlasPrivateHostedZoneId"
-            }    
-        }
+            "VPCRegion": { "Ref": "AWS::Region" }
+          }
+        ],
+        "HostedZoneTags": [
+          {
+            "Key": "ZoneName",
+            "Value": "AtlasInternalHostedZone"
+          }
+        ]
+      }
     }
+  },
+  "Outputs": {
+    "AtlasPrivateHostedZoneId": {
+      "Description": "Atlas private hosted zone id for atlas.com",
+      "Value": {
+        "Ref": "AtlasPrivateHostedZone"
+      },
+      "Export": {
+        "Name": "AtlasPrivateHostedZoneId"
+      }
+    }
+  }
 }

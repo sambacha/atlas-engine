@@ -1,105 +1,116 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Parameters": {
-        "KeyName": {
-            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-            "Type": "String"
-        }
-    },    
-    "Mappings": {
-        "RegionToAMIMap": {
-            "us-east-1": {
-                "AMI": "ami-0323c3dd2da7fb37d"
-            },
-            "us-east-2": {
-                "AMI": "ami-0f7919c33c90f5b58"
-            },
-            "us-west-1": {
-                "AMI": "ami-06fcc1f0bc2c8943f"
-            },
-            "us-west-2": {
-                "AMI": "ami-0d6621c01e8c2de2c"
-            }
-        }
-    },
-    "Resources" : {
-        "AtlasDmzZone1" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : {
-                    "Fn::Join" : [ "", [
-                        {
-                            "Ref" : "AWS::Region"
-                        },
-                        "a"
-                    ] 
-                ]
-                },
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "RegionToAMIMap",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "AMI"
-                    ]
-                },          
-                "KeyName" : { 
-                    "Ref" : "KeyName"
-                },
-                "SecurityGroupIds" : [{ 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasPubSgId" 
-                    }
-                } ], 
-                "SubnetId" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasPubSubnetIdZone1" 
-                    }
-                },
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-dmz-zone1"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install python3 -y", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python3-pip -y", "\n",
-                                "yum install postgresql-devel python3-devel -y", "\n",
-                                "alternatives --install /usr/bin/python python /usr/bin/python3.7 1", "\n",
-                                "pip3 install pgcli", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        }
-    },
-    "Outputs" : {
-        "AtlasPublicDnsNameZone1" : {
-            "Description" : "IP address of the atlas DMZ instance",
-            "Value" : {
-                "Fn::GetAtt" : [
-                    "AtlasDmzZone1",
-                    "PublicDnsName"
-                ]
-            },
-            "Export" : {
-                "Name" : "AtlasPublicDnsNameZone1" 
-            }   
-        }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "KeyName": {
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "String"
     }
+  },
+  "Mappings": {
+    "RegionToAMIMap": {
+      "us-east-1": {
+        "AMI": "ami-0323c3dd2da7fb37d"
+      },
+      "us-east-2": {
+        "AMI": "ami-0f7919c33c90f5b58"
+      },
+      "us-west-1": {
+        "AMI": "ami-06fcc1f0bc2c8943f"
+      },
+      "us-west-2": {
+        "AMI": "ami-0d6621c01e8c2de2c"
+      }
+    }
+  },
+  "Resources": {
+    "AtlasDmzZone1": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region"
+              },
+              "a"
+            ]
+          ]
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "RegionToAMIMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "AMI"
+          ]
+        },
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "SecurityGroupIds": [
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": "AtlasPubSgId"
+            }
+          }
+        ],
+        "SubnetId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasPubSubnetIdZone1"
+          }
+        },
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-dmz-zone1"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install python3 -y",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python3-pip -y",
+                "\n",
+                "yum install postgresql-devel python3-devel -y",
+                "\n",
+                "alternatives --install /usr/bin/python python /usr/bin/python3.7 1",
+                "\n",
+                "pip3 install pgcli",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "AtlasPublicDnsNameZone1": {
+      "Description": "IP address of the atlas DMZ instance",
+      "Value": {
+        "Fn::GetAtt": ["AtlasDmzZone1", "PublicDnsName"]
+      },
+      "Export": {
+        "Name": "AtlasPublicDnsNameZone1"
+      }
+    }
+  }
 }

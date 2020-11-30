@@ -1,88 +1,94 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Parameters": {
-        "CertificateArn": {
-            "Description": "ARN of the certificate in ACM for the internal load balancer",
-            "Type": "String"
-        }
-    },    
-    "Resources" : {
-        "InternalAlb" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
-            "Properties" : {
-                "IpAddressType" : "ipv4",
-                "Name" : "atlas-internal-alb",
-                "Scheme" : "internal",
-                "SecurityGroups" : [{ 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasAppSgId" 
-                    }
-                } ],
-                "Subnets" : [ { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasAppSubnetIdZone1" 
-                    }
-                }, { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasAppSubnetIdZone2" 
-                    }
-                } ],
-                "Type" : "application",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-internal-alb"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ]
-            }
-        },
-        "InternalAlbListener" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::Listener",
-            "DependsOn" : "InternalAlb",
-            "Properties" : {
-                "Certificates" : [ {
-                        "CertificateArn" : { "Ref" : "CertificateArn" }
-                    }
-                ],
-                "LoadBalancerArn" : { "Ref" : "InternalAlb" },
-                "DefaultActions" : [ {
-                    "FixedResponseConfig": {
-                        "StatusCode": "404",
-                        "ContentType": "text/plain",
-                        "MessageBody": "Not Found"
-                    },              
-                    "Order" : 100,
-                    "Type" : "fixed-response"
-                }],
-                "Port" : 443,
-                "Protocol" : "HTTPS"
-            }
-        }
-    },
-    "Outputs" : {
-        "InternalAlbDnsName" : {
-            "Description" : "DNS name of the internal ALB atlas-internal-alb",
-            "Value" : {
-                "Fn::GetAtt" : [
-                    "InternalAlb",
-                    "DNSName"
-                ]
-            },
-            "Export" : {
-                "Name" : "AtlasInternalAlbDnsName"
-            }    
-        },
-        "InternalAlbListenerArn" : {
-            "Description" : "ARN of the internal ALB listener",
-            "Value" : {
-                "Ref" : "InternalAlbListener"
-            },
-            "Export" : {
-                "Name" : "InternalAlbListenerArn" 
-            }   
-        }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "CertificateArn": {
+      "Description": "ARN of the certificate in ACM for the internal load balancer",
+      "Type": "String"
     }
+  },
+  "Resources": {
+    "InternalAlb": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "IpAddressType": "ipv4",
+        "Name": "atlas-internal-alb",
+        "Scheme": "internal",
+        "SecurityGroups": [
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": "AtlasAppSgId"
+            }
+          }
+        ],
+        "Subnets": [
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": "AtlasAppSubnetIdZone1"
+            }
+          },
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": "AtlasAppSubnetIdZone2"
+            }
+          }
+        ],
+        "Type": "application",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-internal-alb"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ]
+      }
+    },
+    "InternalAlbListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "DependsOn": "InternalAlb",
+      "Properties": {
+        "Certificates": [
+          {
+            "CertificateArn": { "Ref": "CertificateArn" }
+          }
+        ],
+        "LoadBalancerArn": { "Ref": "InternalAlb" },
+        "DefaultActions": [
+          {
+            "FixedResponseConfig": {
+              "StatusCode": "404",
+              "ContentType": "text/plain",
+              "MessageBody": "Not Found"
+            },
+            "Order": 100,
+            "Type": "fixed-response"
+          }
+        ],
+        "Port": 443,
+        "Protocol": "HTTPS"
+      }
+    }
+  },
+  "Outputs": {
+    "InternalAlbDnsName": {
+      "Description": "DNS name of the internal ALB atlas-internal-alb",
+      "Value": {
+        "Fn::GetAtt": ["InternalAlb", "DNSName"]
+      },
+      "Export": {
+        "Name": "AtlasInternalAlbDnsName"
+      }
+    },
+    "InternalAlbListenerArn": {
+      "Description": "ARN of the internal ALB listener",
+      "Value": {
+        "Ref": "InternalAlbListener"
+      },
+      "Export": {
+        "Name": "InternalAlbListenerArn"
+      }
+    }
+  }
 }

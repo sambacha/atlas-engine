@@ -1,828 +1,1012 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Resources" : {
-        "AtlasApiGatewaySvc" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : "us-east-2a",
-                "ImageId" : "ami-0e01ce4ee18447327",
-                "KeyName" : "engineh1116-2",
-                "SecurityGroupIds" : [ "sg-0ed749ee95b84582c" ],
-                "SubnetId" : "subnet-04b33d74f1ef1c736",
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-trade-svc"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli", "\n",
-                                "docker pull atlasengine/atlas-trades-aws:latest", "\n",
-                                "echo \"docker run -d -p 8080:8084 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-trades atlasengine/atlas-trades-aws:latest\" >> ~ec2-user/run-trade-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-trade-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-trade-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-trade-svc.sh", "\n",
-                                "~ec2-user/run-trade-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-    "AtlasInfoSvc" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : "us-east-2a",
-                "ImageId" : "ami-0e01ce4ee18447327",
-                "KeyName" : "engineh1116-2",
-                "SecurityGroupIds" : [ "sg-0ed749ee95b84582c" ],
-                "SubnetId" : "subnet-04b33d74f1ef1c736",
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-info-svc"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli", "\n",
-                                "docker pull atlasengine/atlas-info-aws:latest", "\n",
-                                "echo \"docker run -d -p 8080:8086 --name atlas-info atlasengine/atlas-info-aws:latest\" >> ~ec2-user/run-info-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-info-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-info-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-info-svc.sh", "\n",
-                                "~ec2-user/run-info-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        }, 
-        "AtlasProductSvc" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : "us-east-2a",
-                "ImageId" : "ami-0e01ce4ee18447327",
-                "KeyName" : "engineh1116-2",
-                "SecurityGroupIds" : [ "sg-0ed749ee95b84582c" ],
-                "SubnetId" : "subnet-04b33d74f1ef1c736",
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-product-svc"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli", "\n",
-                                "docker pull atlasengine/atlas-products-aws:latest", "\n",
-                                "echo \"docker run -d -p 8080:8080 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-products atlasengine/atlas-products-aws:latest\" >> ~ec2-user/run-product-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-product-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-product-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-product-svc.sh", "\n",
-                                "~ec2-user/run-product-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        }, 
-        "AtlasParticipantSvc" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : "us-east-2a",
-                "ImageId" : "ami-0e01ce4ee18447327",
-                "KeyName" : "engineh1116-2",
-                "SecurityGroupIds" : [ "sg-0ed749ee95b84582c" ],
-                "SubnetId" : "subnet-04b33d74f1ef1c736",
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-participant-svc"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli", "\n",
-                                "docker pull atlasengine/atlas-participants-aws:latest", "\n",
-                                "echo \"docker run -d -p 8080:8081 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-participants atlasengine/atlas-participants-aws:latest\" >> ~ec2-user/run-participant-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-participant-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-participant-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-participant-svc.sh", "\n",
-                                "~ec2-user/run-participant-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-        "AtlasOrderSvc" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : "us-east-2a",
-                "ImageId" : "ami-0e01ce4ee18447327",
-                "KeyName" : "engineh1116-2",
-                "SecurityGroupIds" : [ "sg-0ed749ee95b84582c" ],
-                "SubnetId" : "subnet-04b33d74f1ef1c736",
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-order-svc"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli", "\n",
-                                "docker pull atlasengine/atlas-orders-aws:latest", "\n",
-                                "echo \"docker run -d -p 8080:8082 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\"  --name atlas-orders atlasengine/atlas-orders-aws:latest\" >> ~ec2-user/run-order-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-order-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-order-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-order-svc.sh", "\n",
-                                "~ec2-user/run-order-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-        "AtlasOrderbookSvc" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : "us-east-2a",
-                "ImageId" : "ami-0e01ce4ee18447327",
-                "KeyName" : "engineh1116-2",
-                "SecurityGroupIds" : [ "sg-0ed749ee95b84582c" ],
-                "SubnetId" : "subnet-04b33d74f1ef1c736",
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-orderbook-svc"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli", "\n",
-                                "docker pull atlasengine/atlas-orderbooks-aws:latest", "\n",
-                                "echo \"docker run -d -p 8080:8083 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-orderbooks atlasengine/atlas-orderbooks-aws:latest\" >> ~ec2-user/run-orderbook-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-orderbook-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-orderbook-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-orderbook-svc.sh", "\n",
-                                "~ec2-user/run-orderbook-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-        "AtlasTradeSvc" : {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "AvailabilityZone" : "us-east-2a",
-                "ImageId" : "ami-0e01ce4ee18447327",
-                "KeyName" : "engineh1116-2",
-                "SecurityGroupIds" : [ "sg-0ed749ee95b84582c" ],
-                "SubnetId" : "subnet-04b33d74f1ef1c736",
-                "InstanceType" : "t2.micro",
-                "IamInstanceProfile" : "AdminAccess",
-                "Tags" : [ { 
-                        "Key" : "Name",
-                        "Value" : "atlas-trade-svc"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "UserData" : {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [
-                            "",
-                            [
-                                "#!/bin/bash -ex", "\n",
-                                "yum update -y", "\n",
-                                "yum install docker -y", "\n",
-                                "systemctl start docker", "\n",
-                                "systemctl enable docker", "\n",
-                                "usermod -aG docker ec2-user", "\n",
-                                "yum install gcc -y", "\n",
-                                "yum install python-pip -y", "\n",
-                                "yum install postgresql-devel python-devel -y", "\n",
-                                "pip install pgcli", "\n",
-                                "docker pull atlasengine/atlas-trades-aws:latest", "\n",
-                                "echo \"docker run -d -p 8080:8084 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-trades atlasengine/atlas-trades-aws:latest\" >> ~ec2-user/run-trade-svc.sh", "\n",
-                                "chown ec2-user ~ec2-user/run-trade-svc.sh", "\n",
-                                "chgrp ec2-user ~ec2-user/run-trade-svc.sh", "\n",
-                                "chmod 755 ~ec2-user/run-trade-svc.sh", "\n",
-                                "~ec2-user/run-trade-svc.sh", "\n",
-                                "\n"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-        "InfoSvcTargetGroup" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn" : "AtlasInfoSvc",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckIntervalSeconds" : 30,
-                "HealthCheckPath" : "/index.html",
-                "HealthCheckPort" : "8080",
-                "HealthCheckProtocol" : "HTTP",
-                "HealthCheckTimeoutSeconds" : 5,
-                "HealthyThresholdCount" : 5,
-                "Matcher" : {
-                    "HttpCode" : "200"
-                },
-                "Name" : "atlas-info-svc-grp",
-                "Port" : 8080,
-                "Protocol" : "HTTP",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-info-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { 
-                        "Ref" : "AtlasInfoSvc"
-                    },
-                    "Port" : 8080
-                } ],
-                "TargetType" : "instance",
-                "UnhealthyThresholdCount" : 2,
-                "VpcId" : "vpc-065e6639362af4a39"
-            }
-        },
-        "ProductSvcTargetGroup" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn" : "AtlasProductSvc",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckIntervalSeconds" : 30,
-                "HealthCheckPath" : "/",
-                "HealthCheckPort" : "8080",
-                "HealthCheckProtocol" : "HTTP",
-                "HealthCheckTimeoutSeconds" : 5,
-                "HealthyThresholdCount" : 5,
-                "Matcher" : {
-                    "HttpCode" : "200"
-                },
-                "Name" : "atlas-product-svc-grp",
-                "Port" : 8080,
-                "Protocol" : "HTTP",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-product-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { 
-                        "Ref" : "AtlasProductSvc"
-                    },
-                    "Port" : 8080
-                } ],
-                "TargetType" : "instance",
-                "UnhealthyThresholdCount" : 2,
-                "VpcId" : "vpc-065e6639362af4a39"
-            }
-        },
-        "ParticipantSvcTargetGroup" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn" : "AtlasParticipantSvc",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckIntervalSeconds" : 30,
-                "HealthCheckPath" : "/",
-                "HealthCheckPort" : "8080",
-                "HealthCheckProtocol" : "HTTP",
-                "HealthCheckTimeoutSeconds" : 5,
-                "HealthyThresholdCount" : 5,
-                "Matcher" : {
-                    "HttpCode" : "200"
-                },
-                "Name" : "atlas-participant-svc-grp",
-                "Port" : 8080,
-                "Protocol" : "HTTP",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-participant-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { 
-                        "Ref" : "AtlasParticipantSvc"
-                    },
-                    "Port" : 8080
-                } ],
-                "TargetType" : "instance",
-                "UnhealthyThresholdCount" : 2,
-                "VpcId" : "vpc-065e6639362af4a39"
-            }
-        },
-        "OrderSvcTargetGroup" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn" : "AtlasOrderSvc",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckIntervalSeconds" : 30,
-                "HealthCheckPath" : "/",
-                "HealthCheckPort" : "8080",
-                "HealthCheckProtocol" : "HTTP",
-                "HealthCheckTimeoutSeconds" : 5,
-                "HealthyThresholdCount" : 5,
-                "Matcher" : {
-                    "HttpCode" : "200"
-                },
-                "Name" : "atlas-order-svc-grp",
-                "Port" : 8080,
-                "Protocol" : "HTTP",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-order-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { 
-                        "Ref" : "AtlasOrderSvc"
-                    },
-                    "Port" : 8080
-                } ],
-                "TargetType" : "instance",
-                "UnhealthyThresholdCount" : 2,
-                "VpcId" : "vpc-065e6639362af4a39"
-            }
-        },
-        "OrderbookSvcTargetGroup" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn" : "AtlasOrderbookSvc",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckIntervalSeconds" : 30,
-                "HealthCheckPath" : "/",
-                "HealthCheckPort" : "8080",
-                "HealthCheckProtocol" : "HTTP",
-                "HealthCheckTimeoutSeconds" : 5,
-                "HealthyThresholdCount" : 5,
-                "Matcher" : {
-                    "HttpCode" : "200"
-                },
-                "Name" : "atlas-orderbook-svc-grp",
-                "Port" : 8080,
-                "Protocol" : "HTTP",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-orderbook-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { 
-                        "Ref" : "AtlasOrderbookSvc"
-                    },
-                    "Port" : 8080
-                } ],
-                "TargetType" : "instance",
-                "UnhealthyThresholdCount" : 2,
-                "VpcId" : "vpc-065e6639362af4a39"
-            }
-        },
-        "TradeSvcTargetGroup" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn" : "AtlasTradeSvc",
-            "Properties" : {
-                "HealthCheckEnabled" : true,
-                "HealthCheckIntervalSeconds" : 30,
-                "HealthCheckPath" : "/",
-                "HealthCheckPort" : "8080",
-                "HealthCheckProtocol" : "HTTP",
-                "HealthCheckTimeoutSeconds" : 5,
-                "HealthyThresholdCount" : 5,
-                "Matcher" : {
-                    "HttpCode" : "200"
-                },
-                "Name" : "atlas-trade-svc-grp",
-                "Port" : 8080,
-                "Protocol" : "HTTP",
-                "Tags" : [
-                    {
-                        "Key" : "Name",
-                        "Value" : "atlas-trade-svc-grp"
-                    }, {
-                        "Key" : "Cloudformation",
-                        "Value" : "Yes"
-                    }
-                ],
-                "Targets" : [ {
-                    "Id" : { 
-                        "Ref" : "AtlasTradeSvc"
-                    },
-                    "Port" : 8080
-                } ],
-                "TargetType" : "instance",
-                "UnhealthyThresholdCount" : 2,
-                "VpcId" : "vpc-065e6639362af4a39"
-            }
-        },
-        "InternalAlbListener" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::Listener",
-            "DependsOn" : "InfoSvcTargetGroup",
-            "Properties" : {
-                "LoadBalancerArn" : { 
-                    "Fn::ImportValue" :  {
-                        "Fn::Sub": "AtlasInternalAlbArn" 
-                    } 
-                },
-                "DefaultActions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "InfoSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Order" : 100,
-                    "TargetGroupArn" : {
-                        "Ref" : "InfoSvcTargetGroup"
-                    },
-                    "Type" : "forward"
-                }],
-                "Port" : 80,
-                "Protocol" : "HTTP"
-            }
-        },
-        "InternalAlbListnerProductInternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "ProductSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                } ],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/internal/api/product/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 1
-            }
-        },
-        "InternalAlbListnerProductExternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "ProductSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/api/product/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 2
-            }
-        },
-        "InternalAlbListnerParticipantInternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "ParticipantSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/internal/api/participant/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 3
-            }
-        },
-        "InternalAlbListnerParticipantExternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "ParticipantSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/api/participant/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 4
-            }
-        },
-        "InternalAlbListnerOrderInternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "OrderSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/internal/api/order/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 5
-            }
-        },
-        "InternalAlbListnerOrderExternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "OrderSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/api/order/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 6
-            }
-        },
-        "InternalAlbListnerOrderbookInternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "OrderbookSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/internal/api/orderBook/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 7
-            }
-        },
-        "InternalAlbListnerTradeInternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "TradeSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/internal/api/trade/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 8
-            }
-        },
-        "InternalAlbListnerTradeExternalApiRule" : {
-            "Type" : "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "DependsOn" : "InternalAlbListener",
-            "Properties" : {
-                "Actions" : [ {
-                    "ForwardConfig" : {
-                        "TargetGroups" : [ {
-                            "TargetGroupArn" : {
-                                "Ref" : "OrderSvcTargetGroup"
-                            }
-                        } ]
-                    },
-                    "Type" : "forward"
-                }],
-                "Conditions" : [ {
-                    "Field" : "path-pattern",
-                    "PathPatternConfig" : {
-                        "Values" : [
-                            "/atlas/api/order/*"
-                        ]
-                    }
-                } ],
-                "ListenerArn" : {
-                    "Ref" : "InternalAlbListener"
-                },
-                "Priority" : 9
-            }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "AtlasApiGatewaySvc": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-2a",
+        "ImageId": "ami-0e01ce4ee18447327",
+        "KeyName": "engineh1116-2",
+        "SecurityGroupIds": ["sg-0ed749ee95b84582c"],
+        "SubnetId": "subnet-04b33d74f1ef1c736",
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-trade-svc"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli",
+                "\n",
+                "docker pull atlasengine/atlas-trades-aws:latest",
+                "\n",
+                "echo \"docker run -d -p 8080:8084 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-trades atlasengine/atlas-trades-aws:latest\" >> ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "~ec2-user/run-trade-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
         }
+      }
+    },
+    "AtlasInfoSvc": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-2a",
+        "ImageId": "ami-0e01ce4ee18447327",
+        "KeyName": "engineh1116-2",
+        "SecurityGroupIds": ["sg-0ed749ee95b84582c"],
+        "SubnetId": "subnet-04b33d74f1ef1c736",
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-info-svc"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli",
+                "\n",
+                "docker pull atlasengine/atlas-info-aws:latest",
+                "\n",
+                "echo \"docker run -d -p 8080:8086 --name atlas-info atlasengine/atlas-info-aws:latest\" >> ~ec2-user/run-info-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-info-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-info-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-info-svc.sh",
+                "\n",
+                "~ec2-user/run-info-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AtlasProductSvc": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-2a",
+        "ImageId": "ami-0e01ce4ee18447327",
+        "KeyName": "engineh1116-2",
+        "SecurityGroupIds": ["sg-0ed749ee95b84582c"],
+        "SubnetId": "subnet-04b33d74f1ef1c736",
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-product-svc"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli",
+                "\n",
+                "docker pull atlasengine/atlas-products-aws:latest",
+                "\n",
+                "echo \"docker run -d -p 8080:8080 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-products atlasengine/atlas-products-aws:latest\" >> ~ec2-user/run-product-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-product-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-product-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-product-svc.sh",
+                "\n",
+                "~ec2-user/run-product-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AtlasParticipantSvc": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-2a",
+        "ImageId": "ami-0e01ce4ee18447327",
+        "KeyName": "engineh1116-2",
+        "SecurityGroupIds": ["sg-0ed749ee95b84582c"],
+        "SubnetId": "subnet-04b33d74f1ef1c736",
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-participant-svc"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli",
+                "\n",
+                "docker pull atlasengine/atlas-participants-aws:latest",
+                "\n",
+                "echo \"docker run -d -p 8080:8081 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-participants atlasengine/atlas-participants-aws:latest\" >> ~ec2-user/run-participant-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-participant-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-participant-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-participant-svc.sh",
+                "\n",
+                "~ec2-user/run-participant-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AtlasOrderSvc": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-2a",
+        "ImageId": "ami-0e01ce4ee18447327",
+        "KeyName": "engineh1116-2",
+        "SecurityGroupIds": ["sg-0ed749ee95b84582c"],
+        "SubnetId": "subnet-04b33d74f1ef1c736",
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-order-svc"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli",
+                "\n",
+                "docker pull atlasengine/atlas-orders-aws:latest",
+                "\n",
+                "echo \"docker run -d -p 8080:8082 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\"  --name atlas-orders atlasengine/atlas-orders-aws:latest\" >> ~ec2-user/run-order-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-order-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-order-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-order-svc.sh",
+                "\n",
+                "~ec2-user/run-order-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AtlasOrderbookSvc": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-2a",
+        "ImageId": "ami-0e01ce4ee18447327",
+        "KeyName": "engineh1116-2",
+        "SecurityGroupIds": ["sg-0ed749ee95b84582c"],
+        "SubnetId": "subnet-04b33d74f1ef1c736",
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-orderbook-svc"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli",
+                "\n",
+                "docker pull atlasengine/atlas-orderbooks-aws:latest",
+                "\n",
+                "echo \"docker run -d -p 8080:8083 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-orderbooks atlasengine/atlas-orderbooks-aws:latest\" >> ~ec2-user/run-orderbook-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-orderbook-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-orderbook-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-orderbook-svc.sh",
+                "\n",
+                "~ec2-user/run-orderbook-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AtlasTradeSvc": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-2a",
+        "ImageId": "ami-0e01ce4ee18447327",
+        "KeyName": "engineh1116-2",
+        "SecurityGroupIds": ["sg-0ed749ee95b84582c"],
+        "SubnetId": "subnet-04b33d74f1ef1c736",
+        "InstanceType": "t2.micro",
+        "IamInstanceProfile": "AdminAccess",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-trade-svc"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "\n",
+                "yum update -y",
+                "\n",
+                "yum install docker -y",
+                "\n",
+                "systemctl start docker",
+                "\n",
+                "systemctl enable docker",
+                "\n",
+                "usermod -aG docker ec2-user",
+                "\n",
+                "yum install gcc -y",
+                "\n",
+                "yum install python-pip -y",
+                "\n",
+                "yum install postgresql-devel python-devel -y",
+                "\n",
+                "pip install pgcli",
+                "\n",
+                "docker pull atlasengine/atlas-trades-aws:latest",
+                "\n",
+                "echo \"docker run -d -p 8080:8084 -e \"config_server_uri=http://127.0.0.1:8888\" -e \"DISCOVERY_SERVICE_URI=http://127.0.0.1:8761/eureka\" --name atlas-trades atlasengine/atlas-trades-aws:latest\" >> ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "chown ec2-user ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "chgrp ec2-user ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "chmod 755 ~ec2-user/run-trade-svc.sh",
+                "\n",
+                "~ec2-user/run-trade-svc.sh",
+                "\n",
+                "\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "InfoSvcTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "DependsOn": "AtlasInfoSvc",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/index.html",
+        "HealthCheckPort": "8080",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 5,
+        "Matcher": {
+          "HttpCode": "200"
+        },
+        "Name": "atlas-info-svc-grp",
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-info-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": {
+              "Ref": "AtlasInfoSvc"
+            },
+            "Port": 8080
+          }
+        ],
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 2,
+        "VpcId": "vpc-065e6639362af4a39"
+      }
+    },
+    "ProductSvcTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "DependsOn": "AtlasProductSvc",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/",
+        "HealthCheckPort": "8080",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 5,
+        "Matcher": {
+          "HttpCode": "200"
+        },
+        "Name": "atlas-product-svc-grp",
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-product-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": {
+              "Ref": "AtlasProductSvc"
+            },
+            "Port": 8080
+          }
+        ],
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 2,
+        "VpcId": "vpc-065e6639362af4a39"
+      }
+    },
+    "ParticipantSvcTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "DependsOn": "AtlasParticipantSvc",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/",
+        "HealthCheckPort": "8080",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 5,
+        "Matcher": {
+          "HttpCode": "200"
+        },
+        "Name": "atlas-participant-svc-grp",
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-participant-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": {
+              "Ref": "AtlasParticipantSvc"
+            },
+            "Port": 8080
+          }
+        ],
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 2,
+        "VpcId": "vpc-065e6639362af4a39"
+      }
+    },
+    "OrderSvcTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "DependsOn": "AtlasOrderSvc",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/",
+        "HealthCheckPort": "8080",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 5,
+        "Matcher": {
+          "HttpCode": "200"
+        },
+        "Name": "atlas-order-svc-grp",
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-order-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": {
+              "Ref": "AtlasOrderSvc"
+            },
+            "Port": 8080
+          }
+        ],
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 2,
+        "VpcId": "vpc-065e6639362af4a39"
+      }
+    },
+    "OrderbookSvcTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "DependsOn": "AtlasOrderbookSvc",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/",
+        "HealthCheckPort": "8080",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 5,
+        "Matcher": {
+          "HttpCode": "200"
+        },
+        "Name": "atlas-orderbook-svc-grp",
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-orderbook-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": {
+              "Ref": "AtlasOrderbookSvc"
+            },
+            "Port": 8080
+          }
+        ],
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 2,
+        "VpcId": "vpc-065e6639362af4a39"
+      }
+    },
+    "TradeSvcTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "DependsOn": "AtlasTradeSvc",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/",
+        "HealthCheckPort": "8080",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 5,
+        "Matcher": {
+          "HttpCode": "200"
+        },
+        "Name": "atlas-trade-svc-grp",
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "atlas-trade-svc-grp"
+          },
+          {
+            "Key": "Cloudformation",
+            "Value": "Yes"
+          }
+        ],
+        "Targets": [
+          {
+            "Id": {
+              "Ref": "AtlasTradeSvc"
+            },
+            "Port": 8080
+          }
+        ],
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 2,
+        "VpcId": "vpc-065e6639362af4a39"
+      }
+    },
+    "InternalAlbListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "DependsOn": "InfoSvcTargetGroup",
+      "Properties": {
+        "LoadBalancerArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "AtlasInternalAlbArn"
+          }
+        },
+        "DefaultActions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "InfoSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Order": 100,
+            "TargetGroupArn": {
+              "Ref": "InfoSvcTargetGroup"
+            },
+            "Type": "forward"
+          }
+        ],
+        "Port": 80,
+        "Protocol": "HTTP"
+      }
+    },
+    "InternalAlbListnerProductInternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "ProductSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/internal/api/product/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 1
+      }
+    },
+    "InternalAlbListnerProductExternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "ProductSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/api/product/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 2
+      }
+    },
+    "InternalAlbListnerParticipantInternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "ParticipantSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/internal/api/participant/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 3
+      }
+    },
+    "InternalAlbListnerParticipantExternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "ParticipantSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/api/participant/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 4
+      }
+    },
+    "InternalAlbListnerOrderInternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "OrderSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/internal/api/order/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 5
+      }
+    },
+    "InternalAlbListnerOrderExternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "OrderSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/api/order/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 6
+      }
+    },
+    "InternalAlbListnerOrderbookInternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "OrderbookSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/internal/api/orderBook/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 7
+      }
+    },
+    "InternalAlbListnerTradeInternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "TradeSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/internal/api/trade/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 8
+      }
+    },
+    "InternalAlbListnerTradeExternalApiRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "DependsOn": "InternalAlbListener",
+      "Properties": {
+        "Actions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "OrderSvcTargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/atlas/api/order/*"]
+            }
+          }
+        ],
+        "ListenerArn": {
+          "Ref": "InternalAlbListener"
+        },
+        "Priority": 9
+      }
     }
+  }
 }
