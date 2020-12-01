@@ -614,6 +614,9 @@ value in place of the default password `changeit`.
         atlas-build-certs.sh -t discovery -p changeit -i internal-ca -P changeit -s
         s3://atlas-security
         atlas-build-certs.sh -t config -p changeit -i internal-ca -P changeit -s s3://atlas-security
+
+        ```
+
         ```
 
 4.  Create certificate and private key for load balancers to import into the AWS Certificate Manager
@@ -636,6 +639,7 @@ value in place of the default password `changeit`.
     s3://atlas-security
     atlas-build-certs.sh -t elb -p elb -i internal-ca -P internalca -f atlas.naperiltech.com -s
     s3://atlas-security
+
     ```
 
           Note that the internal load balancer command is provided a required `-r` option to specify AWS
@@ -655,6 +659,8 @@ value in place of the default password `changeit`.
     the case of internet-facing network load balancer, however, the pattern for the DNS name has a
     subtle difference as compared to that of internal applicaiton load balancer. For example, if `-r` is
     set to us-east-2, the DNS is `*.elb.us-east-2.amazonaws.com`
+
+    ```
 
 5.  Import the certificate and private key PEM for the internal ALB and the internet-facing ELB into
     the ACM.
