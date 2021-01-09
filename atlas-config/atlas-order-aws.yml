@@ -1,6 +1,6 @@
 spring:
   applicaton:
-    name: finex-order
+    name: atlas-order
   zipkin:
     baseUrl: ${ZIPKIN_URI}
     sender:
@@ -8,7 +8,7 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
   datasource:
-    url: jdbc:postgresql://finex-database.ciejfzld0efh.us-east-2.rds.amazonaws.com/finex
+    url: jdbc:postgresql://atlas-database.ciejfzld0efh.us-east-2.rds.amazonaws.com/atlas
     username: postgres
     password: postgres
     hikari:

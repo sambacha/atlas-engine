@@ -1,6 +1,6 @@
 spring:
   application:
-    name: finex-zipkin
+    name: atlas-zipkin
 server:
   port: 9411
   ssl:

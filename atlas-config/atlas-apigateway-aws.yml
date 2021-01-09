@@ -1,6 +1,6 @@
 spring:
   applicaton:
-    name: finex-apigateway
+    name: atlas-apigateway
   zipkin:
     baseUrl: ${ZIPKIN_URI}
     sender:
@@ -17,42 +17,42 @@ server:
 
 zuul:
   routes:
-    finex-product-service-internal-api:
-      path: /finex/internal/api/product/**
-      serviceId: finex-product
+    atlas-product-service-internal-api:
+      path: /atlas/internal/api/product/**
+      serviceId: atlas-product
       stripPrefix: false
-    finex-product-service-external-api:
-      path: /finex/api/product/**
-      serviceId: finex-product
+    atlas-product-service-external-api:
+      path: /atlas/api/product/**
+      serviceId: atlas-product
       stripPrefix: false
-    finex-participant-service-internal-api:
-      path: /finex/internal/api/participant/**
-      serviceId: finex-participant
+    atlas-participant-service-internal-api:
+      path: /atlas/internal/api/participant/**
+      serviceId: atlas-participant
       stripPrefix: false
-    finex-participant-service-external-api:
-      path: /finex/api/participant/**
-      serviceId: finex-participant
+    atlas-participant-service-external-api:
+      path: /atlas/api/participant/**
+      serviceId: atlas-participant
       stripPrefix: false
-    finex-order-service-internal-api:
-      path: /finex/internal/api/order/**
-      serviceId: finex-order
+    atlas-order-service-internal-api:
+      path: /atlas/internal/api/order/**
+      serviceId: atlas-order
       stripPrefix: false
-    finex-order-service-external-api:
-      path: /finex/api/order/**
-      serviceId: finex-order
+    atlas-order-service-external-api:
+      path: /atlas/api/order/**
+      serviceId: atlas-order
       stripPrefix: false
-    finex-orderbook-service-internal-api:
-      path: /finex/internal/api/orderBook/**
-      serviceId: finex-orderbook
+    atlas-orderbook-service-internal-api:
+      path: /atlas/internal/api/orderBook/**
+      serviceId: atlas-orderbook
       stripPrefix: false
-    finex-trade-service-internal-api:
-      path: /finex/internal/api/trade/**
-      serviceId: finex-trade
+    atlas-trade-service-internal-api:
+      path: /atlas/internal/api/trade/**
+      serviceId: atlas-trade
       stripPrefix: false
-    finex-trade-service-external-api:
-      path: /finex/api/trade/**
+    atlas-trade-service-external-api:
+      path: /atlas/api/trade/**
       stripPrefix: false
-      serviceId: finex-trade
+      serviceId: atlas-trade
   host:
     socket-timeout-millis: 30000
 

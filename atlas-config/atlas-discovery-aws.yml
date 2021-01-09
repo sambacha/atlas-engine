@@ -1,6 +1,6 @@
 spring:
   application:
-    name: finex-discovery
+    name: atlas-discovery
 server:
   port: 8443
   ssl:

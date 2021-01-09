@@ -1,6 +1,6 @@
 spring:
   applicaton:
-    name: finex-orderbook
+    name: atlas-orderbook
   zipkin:
     baseUrl: ${ZIPKIN_URI}
     sender:
