@@ -46,22 +46,22 @@ function showUsage() {
 # ---------------------------------------------------------------------------
 function createInternalCA() {
     # Private key for internal certificate authority
-    openssl req -newkey rsa:2048 -keyout $FINEX_TLS_TARGET-key.pem -out $FINEX_TLS_TARGET.csr -passout pass:$FINEX_TLS_PASSWORD \
+    openssl req -newkey rsa:2048 -keyout $ATLAS_TLS_TARGET-key.pem -out $ATLAS_TLS_TARGET.csr -passout pass:$ATLAS_TLS_PASSWORD \
     -subj "/C=US/ST=Illinois/L=Chicago/O=Acme Inc/OU=Administration/CN=Acme Certificate Authority"
 
     # Extensions configuration file to add BasicConfiguration designating
     # the certificate as a CA certificate
-    touch $FINEX_TLS_TARGET-extensions.cnf
-    echo "basicConstraints=critical,CA:TRUE" >> $FINEX_TLS_TARGET-extensions.cnf
+    touch $ATLAS_TLS_TARGET-extensions.cnf
+    echo "basicConstraints=critical,CA:TRUE" >> $ATLAS_TLS_TARGET-extensions.cnf
 
     # Create empty serial number file. This file will be used to create serial numbers
     # for signing certificate requets
-    touch $FINEX_TLS_TARGET-serial.ser 
-    echo "10B9342AB325ED00" > $FINEX_TLS_TARGET-serial.ser 
+    touch $ATLAS_TLS_TARGET-serial.ser 
+    echo "10B9342AB325ED00" > $ATLAS_TLS_TARGET-serial.ser 
 
     # Self-sign the CA certificate
-    openssl x509 -req -in $FINEX_TLS_TARGET.csr -passin pass:$FINEX_TLS_PASSWORD -days 365 -signkey $FINEX_TLS_TARGET-key.pem \
-    -CAserial $FINEX_TLS_TARGET-serial.ser -out $FINEX_TLS_TARGET.crt -extfile $FINEX_TLS_TARGET-extensions.cnf
+    openssl x509 -req -in $ATLAS_TLS_TARGET.csr -passin pass:$ATLAS_TLS_PASSWORD -days 365 -signkey $ATLAS_TLS_TARGET-key.pem \
+    -CAserial $ATLAS_TLS_TARGET-serial.ser -out $ATLAS_TLS_TARGET.crt -extfile $ATLAS_TLS_TARGET-extensions.cnf
 
     echo "Completed TLS artificats for Internal CA."
     echo "The target name and password used for this Internal CA must be specified "
@@ -76,25 +76,25 @@ function createInternalCA() {
 # ---------------------------------------------------------------------------
 function createService() {
     # Private key and CSR
-    openssl req -newkey rsa:2048 -keyout atlas-$FINEX_TLS_TARGET-key.pem -out atlas-$FINEX_TLS_TARGET.csr -passout pass:$FINEX_TLS_PASSWORD \
-    -subj "/C=US/ST=Illinois/L=Chiago/O=NaperIlTech/OU=Atlas/CN=*.$FINEX_TLS_TARGET.atlas.com"
+    openssl req -newkey rsa:2048 -keyout atlas-$ATLAS_TLS_TARGET-key.pem -out atlas-$ATLAS_TLS_TARGET.csr -passout pass:$ATLAS_TLS_PASSWORD \
+    -subj "/C=US/ST=Illinois/L=Chiago/O=NaperIlTech/OU=Atlas/CN=*.$ATLAS_TLS_TARGET.atlas.com"
 
     # Extensions configuration file to add DNS names for which 
     # this certificate is applicable
-    touch atlas-$FINEX_TLS_TARGET-extensions.cnf
-    echo "subjectAltName=DNS:*.$FINEX_TLS_TARGET.atlas.com" >> atlas-$FINEX_TLS_TARGET-extensions.cnf
+    touch atlas-$ATLAS_TLS_TARGET-extensions.cnf
+    echo "subjectAltName=DNS:*.$ATLAS_TLS_TARGET.atlas.com" >> atlas-$ATLAS_TLS_TARGET-extensions.cnf
 
     # Sign the service certificate request (csr) using the Internal CA certificate
-    openssl x509 -req -in atlas-$FINEX_TLS_TARGET.csr -passin pass:$FINEX_INTERNAL_CA_PASSWORD -days 365 -CA $FINEX_INTERNAL_CA.crt -CAkey $FINEX_INTERNAL_CA-key.pem \
-    -CAserial $FINEX_INTERNAL_CA-serial.ser -out atlas-$FINEX_TLS_TARGET.crt -extfile atlas-$FINEX_TLS_TARGET-extensions.cnf
+    openssl x509 -req -in atlas-$ATLAS_TLS_TARGET.csr -passin pass:$ATLAS_INTERNAL_CA_PASSWORD -days 365 -CA $ATLAS_INTERNAL_CA.crt -CAkey $ATLAS_INTERNAL_CA-key.pem \
+    -CAserial $ATLAS_INTERNAL_CA-serial.ser -out atlas-$ATLAS_TLS_TARGET.crt -extfile atlas-$ATLAS_TLS_TARGET-extensions.cnf
 
     # PKCS12 keystore with service certificate chain that includes the Internal CA certificate.
-    openssl pkcs12 -export -in atlas-$FINEX_TLS_TARGET.crt -inkey atlas-$FINEX_TLS_TARGET-key.pem -passin pass:$FINEX_TLS_PASSWORD \
-    -name $FINEX_TLS_TARGET -CAfile $FINEX_INTERNAL_CA.crt -caname $FINEX_INTERNAL_CA -chain -out atlas-$FINEX_TLS_TARGET.p12 -passout pass:$FINEX_TLS_PASSWORD
+    openssl pkcs12 -export -in atlas-$ATLAS_TLS_TARGET.crt -inkey atlas-$ATLAS_TLS_TARGET-key.pem -passin pass:$ATLAS_TLS_PASSWORD \
+    -name $ATLAS_TLS_TARGET -CAfile $ATLAS_INTERNAL_CA.crt -caname $ATLAS_INTERNAL_CA -chain -out atlas-$ATLAS_TLS_TARGET.p12 -passout pass:$ATLAS_TLS_PASSWORD
 
-    echo "$FINEX_TLS_PASSWORD" > ./$FINEX_TLS_TARGET.txt
+    echo "$ATLAS_TLS_PASSWORD" > ./$ATLAS_TLS_TARGET.txt
 
-    echo "Completed TLS artificats for $FINEX_TLS_TARGET."
+    echo "Completed TLS artificats for $ATLAS_TLS_TARGET."
 }
 
 # ---------------------------------------------------------------------------
@@ -108,47 +108,47 @@ function createLoadBalancer() {
     echo "Will use LB DNS: $LB_DNS_NAME"
 
     # Private key and CSR
-    openssl req -newkey rsa:2048 -keyout atlas-$FINEX_TLS_TARGET-key.pem -out atlas-$FINEX_TLS_TARGET.csr -passout pass:$FINEX_TLS_PASSWORD \
+    openssl req -newkey rsa:2048 -keyout atlas-$ATLAS_TLS_TARGET-key.pem -out atlas-$ATLAS_TLS_TARGET.csr -passout pass:$ATLAS_TLS_PASSWORD \
     -subj "/C=US/ST=Illinois/L=Chiago/O=NaperIlTech/OU=Atlas/CN=$LB_DNS_NAME"
 
     # Extensions configuration file to add DNS names for which 
     # this certificate is applicable
-    touch atlas-$FINEX_TLS_TARGET-extensions.cnf
-    echo "subjectAltName=DNS:$LB_DNS_NAME" >> atlas-$FINEX_TLS_TARGET-extensions.cnf
+    touch atlas-$ATLAS_TLS_TARGET-extensions.cnf
+    echo "subjectAltName=DNS:$LB_DNS_NAME" >> atlas-$ATLAS_TLS_TARGET-extensions.cnf
 
     # Sign the service certificate request (csr) using the Internal CA certificate
-    openssl x509 -req -in atlas-$FINEX_TLS_TARGET.csr -passin pass:$FINEX_INTERNAL_CA_PASSWORD -days 365 -CA $FINEX_INTERNAL_CA.crt -CAkey $FINEX_INTERNAL_CA-key.pem \
-    -CAserial $FINEX_INTERNAL_CA-serial.ser -out atlas-$FINEX_TLS_TARGET.crt -extfile atlas-$FINEX_TLS_TARGET-extensions.cnf
+    openssl x509 -req -in atlas-$ATLAS_TLS_TARGET.csr -passin pass:$ATLAS_INTERNAL_CA_PASSWORD -days 365 -CA $ATLAS_INTERNAL_CA.crt -CAkey $ATLAS_INTERNAL_CA-key.pem \
+    -CAserial $ATLAS_INTERNAL_CA-serial.ser -out atlas-$ATLAS_TLS_TARGET.crt -extfile atlas-$ATLAS_TLS_TARGET-extensions.cnf
 
     # Create a PEM text file for the load balancer certificate
-    openssl rsa -in atlas-$FINEX_TLS_TARGET-key.pem -passin pass:$FINEX_TLS_PASSWORD > atlas-$FINEX_TLS_TARGET-acm-certificate-private-key.pem
+    openssl rsa -in atlas-$ATLAS_TLS_TARGET-key.pem -passin pass:$ATLAS_TLS_PASSWORD > atlas-$ATLAS_TLS_TARGET-acm-certificate-private-key.pem
 
-    echo "Completed TLS artificats for $FINEX_TLS_TARGET."
+    echo "Completed TLS artificats for $ATLAS_TLS_TARGET."
 }
 
 # ---------------------------------------------------------------------------
 # Copy to S3 bucket
 # ---------------------------------------------------------------------------
 function copyToS3() {
-    if [[ "$FINEX_TLS_TARGET" == "internal-ca" ]]; then 
+    if [[ "$ATLAS_TLS_TARGET" == "internal-ca" ]]; then 
         if [[ -f "internal-ca.crt" ]]; then
-            aws s3 cp ./$FINEX_TLS_TARGET.crt $FINEX_S3_BUCKET
-            aws s3 cp ./$FINEX_TLS_TARGET.crt $FINEX_S3_BUCKET/atlas-certificate-chain.pem
-            echo "Copied relevant artifacts to $FINEX_S3_BUCKET on AWS account $AWS_ACCOUNT"
+            aws s3 cp ./$ATLAS_TLS_TARGET.crt $ATLAS_S3_BUCKET
+            aws s3 cp ./$ATLAS_TLS_TARGET.crt $ATLAS_S3_BUCKET/atlas-certificate-chain.pem
+            echo "Copied relevant artifacts to $ATLAS_S3_BUCKET on AWS account $AWS_ACCOUNT"
         fi
     else 
-        if [[ -f "atlas-$FINEX_TLS_TARGET.p12" ]]; then 
-            aws s3 cp ./atlas-$FINEX_TLS_TARGET.p12 $FINEX_S3_BUCKET
-            aws s3 cp ./$FINEX_TLS_TARGET.txt $FINEX_S3_BUCKET
-            rm atlas-$FINEX_TLS_TARGET*
-            rm $FINEX_TLS_TARGET.txt
-            echo "Copied relevant artifacts to $FINEX_S3_BUCKET on AWS account $AWS_ACCOUNT"
+        if [[ -f "atlas-$ATLAS_TLS_TARGET.p12" ]]; then 
+            aws s3 cp ./atlas-$ATLAS_TLS_TARGET.p12 $ATLAS_S3_BUCKET
+            aws s3 cp ./$ATLAS_TLS_TARGET.txt $ATLAS_S3_BUCKET
+            rm atlas-$ATLAS_TLS_TARGET*
+            rm $ATLAS_TLS_TARGET.txt
+            echo "Copied relevant artifacts to $ATLAS_S3_BUCKET on AWS account $AWS_ACCOUNT"
         fi
-        if [[ -f "atlas-$FINEX_TLS_TARGET-acm-certificate-private-key.pem" ]]; then 
-            aws s3 cp ./atlas-$FINEX_TLS_TARGET.crt $FINEX_S3_BUCKET/atlas-$FINEX_TLS_TARGET-acm-certificate-body.pem
-            aws s3 cp atlas-$FINEX_TLS_TARGET-acm-certificate-private-key.pem $FINEX_S3_BUCKET 
-            rm atlas-$FINEX_TLS_TARGET*
-            echo "Copied relevant artifacts to $FINEX_S3_BUCKET on AWS account $AWS_ACCOUNT"
+        if [[ -f "atlas-$ATLAS_TLS_TARGET-acm-certificate-private-key.pem" ]]; then 
+            aws s3 cp ./atlas-$ATLAS_TLS_TARGET.crt $ATLAS_S3_BUCKET/atlas-$ATLAS_TLS_TARGET-acm-certificate-body.pem
+            aws s3 cp atlas-$ATLAS_TLS_TARGET-acm-certificate-private-key.pem $ATLAS_S3_BUCKET 
+            rm atlas-$ATLAS_TLS_TARGET*
+            echo "Copied relevant artifacts to $ATLAS_S3_BUCKET on AWS account $AWS_ACCOUNT"
         fi
     fi
 }
@@ -156,25 +156,25 @@ function copyToS3() {
 while getopts ":t:p:i:P:s:r:f:h" opt; do
   case ${opt} in
     t )
-      FINEX_TLS_TARGET=$OPTARG
+      ATLAS_TLS_TARGET=$OPTARG
       ;;
     p )
-      FINEX_TLS_PASSWORD=$OPTARG
+      ATLAS_TLS_PASSWORD=$OPTARG
       ;;
     s )
-      FINEX_S3_BUCKET=$OPTARG
+      ATLAS_S3_BUCKET=$OPTARG
       ;;
     i )
-      FINEX_INTERNAL_CA=$OPTARG
+      ATLAS_INTERNAL_CA=$OPTARG
       ;;
     P )
-      FINEX_INTERNAL_CA_PASSWORD=$OPTARG
+      ATLAS_INTERNAL_CA_PASSWORD=$OPTARG
       ;;
     r )
-      FINEX_AWS_REGION=$OPTARG
+      ATLAS_AWS_REGION=$OPTARG
       ;;
     f )
-      FINEX_URL=$OPTARG
+      ATLAS_URL=$OPTARG
       ;;
     h )
       showUsage
@@ -192,14 +192,14 @@ while getopts ":t:p:i:P:s:r:f:h" opt; do
 done
 
 VALID_ARGUMENTS="true"
-if [[ -z "$FINEX_TLS_TARGET" ]]; then
+if [[ -z "$ATLAS_TLS_TARGET" ]]; then
     VALID_ARGUMENTS="false"
     echo "Missing target for TLS certificate artifacts. Must be one of [internal-ca, ilb, elb, apigateway, discovery, config, product, participant, order, orderbook, trade]"
 else 
-    case "$FINEX_TLS_TARGET" in
+    case "$ATLAS_TLS_TARGET" in
         ilb|elb|apigateway|discovery|config|product|participant|order|orderbook|trade)
-            echo "Building TLS artificats for $FINEX_TLS_TARGET ..."
-            if [[ -z "$FINEX_INTERNAL_CA"  || -z "$FINEX_INTERNAL_CA_PASSWORD"  ]]; then 
+            echo "Building TLS artificats for $ATLAS_TLS_TARGET ..."
+            if [[ -z "$ATLAS_INTERNAL_CA"  || -z "$ATLAS_INTERNAL_CA_PASSWORD"  ]]; then 
                 VALID_ARGUMENTS="false"
                 echo "Must specify internal CA alias and password for service targert"
             fi
@@ -208,17 +208,17 @@ else
             ;;
         *)
             VALID_ARGUMENTS="false"
-            echo "$FINEX_TLS_TARGET is an invalid target"
+            echo "$ATLAS_TLS_TARGET is an invalid target"
             ;;
     esac
 fi
 
-if [[ -z "$FINEX_TLS_PASSWORD" ]]; then
+if [[ -z "$ATLAS_TLS_PASSWORD" ]]; then
     VALID_ARGUMENTS="false"
     echo "Missing password for TLS private key and keystore"
 fi
 
-if [[ -n "$FINEX_S3_BUCKET" ]]; then
+if [[ -n "$ATLAS_S3_BUCKET" ]]; then
     AWS_CLI_CHECK=`aws sts get-caller-identity 2> /dev/null`
     if [[ "$AWS_CLI_CHECK" == *"Account"* ]]; then
         AWS_ACCOUNT=`aws sts get-caller-identity | grep Account | awk -F: '{print $2}' | tr '"' ' ' | tr ',', ' '`
@@ -228,24 +228,24 @@ if [[ -n "$FINEX_S3_BUCKET" ]]; then
     fi
 fi
 
-if [[ "$FINEX_TLS_TARGET" == "ilb" ]]; then
-    if [[ -z "$FINEX_AWS_REGION" ]]; then
+if [[ "$ATLAS_TLS_TARGET" == "ilb" ]]; then
+    if [[ -z "$ATLAS_AWS_REGION" ]]; then
         echo "AWS region must be specified when creating certificate for AWS internal load balancer"
         VALID_ARGUMENTS="false"
     else
-        LB_DNS_NAME="*.$FINEX_AWS_REGION.elb.amazonaws.com"
+        LB_DNS_NAME="*.$ATLAS_AWS_REGION.elb.amazonaws.com"
     fi
 fi
 
-if [[ "$FINEX_TLS_TARGET" == "elb" ]]; then
-    if [[ -n "$FINEX_URL" ]]; then
-        LB_DNS_NAME=$FINEX_URL
+if [[ "$ATLAS_TLS_TARGET" == "elb" ]]; then
+    if [[ -n "$ATLAS_URL" ]]; then
+        LB_DNS_NAME=$ATLAS_URL
     else
-        if [[ -z "$FINEX_AWS_REGION" ]]; then
+        if [[ -z "$ATLAS_AWS_REGION" ]]; then
             echo "AWS region must be specified when public url is unsepcified and creating certificate for AWS internet-facing load balancer"
             VALID_ARGUMENTS="false"
         else
-            LB_DNS_NAME="*.elb.$FINEX_AWS_REGION.amazonaws.com"
+            LB_DNS_NAME="*.elb.$ATLAS_AWS_REGION.amazonaws.com"
         fi
     fi
 fi
@@ -255,7 +255,7 @@ if [[ "$VALID_ARGUMENTS" == "false" ]]; then
     exit 1
 fi
 
-case "$FINEX_TLS_TARGET" in
+case "$ATLAS_TLS_TARGET" in
     internal-ca)
         createInternalCA
         ;;
@@ -267,6 +267,6 @@ case "$FINEX_TLS_TARGET" in
         ;;
 esac
  
-if [[ -n "$FINEX_S3_BUCKET" ]]; then
+if [[ -n "$ATLAS_S3_BUCKET" ]]; then
     copyToS3
 fi

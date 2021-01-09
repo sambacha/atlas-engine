@@ -7,12 +7,12 @@
 # Waits for the stack create operation to complete either successfully or in error.
 function create_aws_stack() {
 
-    echo "Creating $2 in AWS region $FINEX_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/$1"
+    echo "Creating $2 in AWS region $ATLAS_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/$1"
     sleep 10   
     if [[ -z "$3" ]]; then
-        CREATE_OUTPUT=`aws --region $FINEX_AWS_REGION cloudformation create-stack --stack-name $2 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
+        CREATE_OUTPUT=`aws --region $ATLAS_AWS_REGION cloudformation create-stack --stack-name $2 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
     else
-        CREATE_OUTPUT=`aws --region $FINEX_AWS_REGION cloudformation create-stack --stack-name $2 --parameters $3 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
+        CREATE_OUTPUT=`aws --region $ATLAS_AWS_REGION cloudformation create-stack --stack-name $2 --parameters $3 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
     fi
 
     if [[ "$CREATE_OUTPUT" =~ "StackId" ]]; then
@@ -28,7 +28,7 @@ function create_aws_stack() {
     while [ $STACK_CREATED -eq 0 ]
     do 
         sleep 30
-        STACK_STATUS=`aws --region $FINEX_AWS_REGION cloudformation describe-stacks --stack-name $2 --query "Stacks[0].StackStatus" | tr '"' ' ' | tr -d [:space:]`
+        STACK_STATUS=`aws --region $ATLAS_AWS_REGION cloudformation describe-stacks --stack-name $2 --query "Stacks[0].StackStatus" | tr '"' ' ' | tr -d [:space:]`
         if [[ "$STACK_STATUS" == "CREATE_COMPLETE" ]]; then
             echo "$2 stack creation is complete"
             STACK_CREATED=1
@@ -58,7 +58,7 @@ function create_aws_stack() {
 # $1 is AWS stack name
 # $2 is OutputKey name
 function get_aws_stack_output() {
-    OUTPUT_VALUE=`aws --region $FINEX_AWS_REGION cloudformation describe-stacks --stack-name $1 --query "Stacks[0].Outputs[?OutputKey=='$2'].OutputValue" --output text`
+    OUTPUT_VALUE=`aws --region $ATLAS_AWS_REGION cloudformation describe-stacks --stack-name $1 --query "Stacks[0].Outputs[?OutputKey=='$2'].OutputValue" --output text`
     echo "$OUTPUT_VALUE"
 }
 
@@ -81,12 +81,12 @@ function get_acm_certificate_arn() {
 # Deploy the atlas-nat-gateway so that all services in the private subnet
 # have internet access to install docker and other packages
 
-STACK_NAME="atlas-nat-gateway-$FINEX_AWS_REGION"
+STACK_NAME="atlas-nat-gateway-$ATLAS_AWS_REGION"
 create_aws_stack atlas-nat-gateway.json $STACK_NAME 
 
 # Deploy internal application load balancer. The DNS name of the interanl ALB
 # will be supplied into the docker images for all application services
-STACK_NAME="atlas-internal-alb-$FINEX_AWS_REGION"
+STACK_NAME="atlas-internal-alb-$ATLAS_AWS_REGION"
 CERTIFICATE_NAME_TAG="atlas-ilb"
 get_acm_certificate_arn $CERTIFICATE_NAME_TAG
 create_aws_stack atlas-internal-alb.json $STACK_NAME "ParameterKey=CertificateArn,ParameterValue=$LB_CERTIFICATE_ARN"
@@ -94,35 +94,35 @@ INTERNAL_ALB_DNS_NAME=`get_aws_stack_output $STACK_NAME InternalAlbDnsName`
 echo "Internal ALB DNS Name is [$INTERNAL_ALB_DNS_NAME]"
 
 # Deploy external application load balancer. 
-STACK_NAME="atlas-external-alb-$FINEX_AWS_REGION"
+STACK_NAME="atlas-external-alb-$ATLAS_AWS_REGION"
 create_aws_stack atlas-external-alb.json $STACK_NAME
 EXTERNAL_ALB_DNS_NAME=`get_aws_stack_output $STACK_NAME ExternalAlbDnsName`
 echo "External ALB DNS Name is [$EXTERNAL_ALB_DNS_NAME]"
 
 # Deploy the config service EC2 and add it to the internal ALB
-STACK_NAME="atlas-config-service-$FINEX_AWS_REGION-zone1"
-create_aws_stack atlas-config-service-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$FINEX_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$FINEX_DOCKER_USERNAME ParameterKey=ConfigGitUri,ParameterValue=$FINEX_GIT_REPO ParameterKey=ConfigGitUsername,ParameterValue=$FINEX_GIT_USER ParameterKey=ConfigGitPassword,ParameterValue=$FINEX_GIT_PASSWORD"
+STACK_NAME="atlas-config-service-$ATLAS_AWS_REGION-zone1"
+create_aws_stack atlas-config-service-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$ATLAS_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$ATLAS_DOCKER_USERNAME ParameterKey=ConfigGitUri,ParameterValue=$ATLAS_GIT_REPO ParameterKey=ConfigGitUsername,ParameterValue=$ATLAS_GIT_USER ParameterKey=ConfigGitPassword,ParameterValue=$ATLAS_GIT_PASSWORD"
 
 # Wait 1 minutes to let the configuration service become available via the load balancer
 echo "Waiting 1 minute .... for configuration service to become visible via load balancer"
 sleep 60
 
 # Deploy the discovery service EC2 and add it to the internal ALB
-STACK_NAME="atlas-discovery-service-$FINEX_AWS_REGION-zone1"
-create_aws_stack atlas-discovery-service-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$FINEX_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$FINEX_DOCKER_USERNAME"
+STACK_NAME="atlas-discovery-service-$ATLAS_AWS_REGION-zone1"
+create_aws_stack atlas-discovery-service-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$ATLAS_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$ATLAS_DOCKER_USERNAME"
 
 echo "Waiting 1 minute .... for discovery service to become visible via load balancer"
 sleep 60
 
 # Deploy the API gateway EC2 and add it to the internal ALB
-STACK_NAME="atlas-apigateway-service-$FINEX_AWS_REGION-zone1"
+STACK_NAME="atlas-apigateway-service-$ATLAS_AWS_REGION-zone1"
 CERTIFICATE_NAME_TAG="atlas-elb"
 get_acm_certificate_arn $CERTIFICATE_NAME_TAG
-create_aws_stack atlas-apigateway-service-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$FINEX_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$FINEX_DOCKER_USERNAME ParameterKey=CertificateArn,ParameterValue=$LB_CERTIFICATE_ARN"
+create_aws_stack atlas-apigateway-service-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$ATLAS_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$ATLAS_DOCKER_USERNAME ParameterKey=CertificateArn,ParameterValue=$LB_CERTIFICATE_ARN"
 
 # Deploy all application services
-STACK_NAME="atlas-application-services-$FINEX_AWS_REGION-zone1"
-create_aws_stack atlas-application-services-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$FINEX_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$FINEX_DOCKER_USERNAME"
+STACK_NAME="atlas-application-services-$ATLAS_AWS_REGION-zone1"
+create_aws_stack atlas-application-services-zone1.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$ATLAS_AWS_KEY_NAME ParameterKey=DockerUsername,ParameterValue=$ATLAS_DOCKER_USERNAME"
 
 # Create DNS A-record tying http://atlas.mydomain.com to the external ALB so
 # external users can invoke the atlas API in the public internet via http://atlas.mydomain.com
@@ -131,9 +131,9 @@ create_aws_stack atlas-application-services-zone1.json $STACK_NAME "ParameterKey
 # If these environment variables are not defined, DNS record will not be created but the user
 # can still invoke the API from public internet using the public DNS name of the internet-facing external ALB
 #
-if [[ -z $FINEX_R53_HOSTED_ZONE_ID || -z $FINEX_URL ]]; then
+if [[ -z $ATLAS_R53_HOSTED_ZONE_ID || -z $ATLAS_URL ]]; then
     echo "Route 53 hosted zone id and the atlas URL are not defined as environment variables. Will not register a DNS record to the internet-facing load balancer"
 else
-    STACK_NAME="atlas-dns-$FINEX_AWS_REGION"
-    create_aws_stack atlas-dns.json $STACK_NAME "ParameterKey=DNSHostedZoneId,ParameterValue=$FINEX_R53_HOSTED_ZONE_ID ParameterKey=AtlasURL,ParameterValue=$FINEX_URL"
+    STACK_NAME="atlas-dns-$ATLAS_AWS_REGION"
+    create_aws_stack atlas-dns.json $STACK_NAME "ParameterKey=DNSHostedZoneId,ParameterValue=$ATLAS_R53_HOSTED_ZONE_ID ParameterKey=AtlasURL,ParameterValue=$ATLAS_URL"
 fi
