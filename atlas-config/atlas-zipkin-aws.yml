@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: finex-zipkin
+server:
+  port: 9411
+  ssl:
+    enabled: false
+logging:
+  level:
+    root: INFO

@@ -1,0 +1,75 @@
+spring:
+  applicaton:
+    name: finex-apigateway
+  zipkin:
+    baseUrl: ${ZIPKIN_URI}
+    sender:
+      type: ${ZIPKIN_SENDER_TYPE}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: ${TLS_KEYSTORE}
+    key-store-password: ${TLS_KEYSTORE_PASSWORD}
+    key-store-type: PKCS12
+
+zuul:
+  routes:
+    finex-product-service-internal-api:
+      path: /finex/internal/api/product/**
+      serviceId: finex-product
+      stripPrefix: false
+    finex-product-service-external-api:
+      path: /finex/api/product/**
+      serviceId: finex-product
+      stripPrefix: false
+    finex-participant-service-internal-api:
+      path: /finex/internal/api/participant/**
+      serviceId: finex-participant
+      stripPrefix: false
+    finex-participant-service-external-api:
+      path: /finex/api/participant/**
+      serviceId: finex-participant
+      stripPrefix: false
+    finex-order-service-internal-api:
+      path: /finex/internal/api/order/**
+      serviceId: finex-order
+      stripPrefix: false
+    finex-order-service-external-api:
+      path: /finex/api/order/**
+      serviceId: finex-order
+      stripPrefix: false
+    finex-orderbook-service-internal-api:
+      path: /finex/internal/api/orderBook/**
+      serviceId: finex-orderbook
+      stripPrefix: false
+    finex-trade-service-internal-api:
+      path: /finex/internal/api/trade/**
+      serviceId: finex-trade
+      stripPrefix: false
+    finex-trade-service-external-api:
+      path: /finex/api/trade/**
+      stripPrefix: false
+      serviceId: finex-trade
+  host:
+    socket-timeout-millis: 30000
+
+ribbon:
+  ReadTimeout: 60000
+
+eureka:
+  client:
+    fetch-registry: true
+    securePortEnabled: true
+    serviceUrl:
+      defaultZone: ${ATLAS_DISCOVERY_URI}
+  instance:
+    nonSecurePortEnabled: false
+    securePortEnabled: true
+    securePort: 443
+    statusPageUrl: https://${ATLAS_DISCOVERY_CLIENT_HOSTNAME}:${eureka.instance.securePort}/actuator/info
+    healthCheckUrl: https://${ATLAS_DISCOVERY_CLIENT_HOSTNAME}:${eureka.instance.securePort}/actuator/health
+    preferIpAddress: false
+    hostname: ${ATLAS_DISCOVERY_CLIENT_HOSTNAME}

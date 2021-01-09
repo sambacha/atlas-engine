@@ -1,0 +1,51 @@
+spring:
+  applicaton:
+    name: finex-order
+  zipkin:
+    baseUrl: ${ZIPKIN_URI}
+    sender:
+      type: ${ZIPKIN_SENDER_TYPE}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+  datasource:
+    url: jdbc:postgresql://finex-database.ciejfzld0efh.us-east-2.rds.amazonaws.com/finex
+    username: postgres
+    password: postgres
+    hikari:
+      minimumIdle: 1
+      maximumPoolSize: 3
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+  jpa:
+    generate: true
+    properties:
+      hibernate:
+        jdbc:
+          non_contextual_creation: true
+  database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: ${TLS_KEYSTORE}
+    key-store-password: ${TLS_KEYSTORE_PASSWORD}
+    key-store-type: PKCS12
+
+eureka:
+  client:
+    fetch-registry: true
+    securePortEnabled: true
+    serviceUrl:
+      defaultZone: ${ATLAS_DISCOVERY_URI}
+  instance:
+    nonSecurePortEnabled: false
+    securePortEnabled: true
+    securePort: 443
+    statusPageUrl: https://${ATLAS_DISCOVERY_CLIENT_HOSTNAME}:${eureka.instance.securePort}/actuator/info
+    healthCheckUrl: https://${ATLAS_DISCOVERY_CLIENT_HOSTNAME}:${eureka.instance.securePort}/actuator/health
+    preferIpAddress: false
+    hostname: ${ATLAS_DISCOVERY_CLIENT_HOSTNAME}
+  
+
