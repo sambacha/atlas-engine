@@ -7,8 +7,8 @@
 function create_aws_stack() {
 
     sleep 10
-    echo "Creating $2 in AWS region $FINEX_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/$1"
-    CREATE_OUTPUT=`aws --region $FINEX_AWS_REGION cloudformation create-stack  --stack-name $2 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
+    echo "Creating $2 in AWS region $ATLAS_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/$1"
+    CREATE_OUTPUT=`aws --region $ATLAS_AWS_REGION cloudformation create-stack  --stack-name $2 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
     
     if [[ "$CREATE_OUTPUT" =~ "StackId" ]]; then
         STACK_ID=`echo $CREATE_OUTPUT | tr '\n' ' ' | grep StackId | sed s/^.*StackId\"://  | tr '"' ' ' | tr -d [:space:]`
@@ -23,7 +23,7 @@ function create_aws_stack() {
     while [ $STACK_CREATED -eq 0 ]
     do 
         sleep 30
-        STACK_STATUS=`aws --region $FINEX_AWS_REGION cloudformation describe-stacks --stack-name $2 --query "Stacks[0].StackStatus" | tr '"' ' ' | tr -d [:space:]`
+        STACK_STATUS=`aws --region $ATLAS_AWS_REGION cloudformation describe-stacks --stack-name $2 --query "Stacks[0].StackStatus" | tr '"' ' ' | tr -d [:space:]`
         if [[ "$STACK_STATUS" == "CREATE_COMPLETE" ]]; then
             echo "$2 stack creation is complete"
             STACK_CREATED=1
@@ -51,8 +51,8 @@ function create_aws_stack() {
 
 # Create VPC in AWS region specified by the input argument number 2. The stack name will be suffixed
 # with the same AWS region name specified in argument number 2
-STACK_NAME="atlas-vpc-$FINEX_AWS_REGION"
+STACK_NAME="atlas-vpc-$ATLAS_AWS_REGION"
 create_aws_stack atlas-vpc.json $STACK_NAME
 
-STACK_NAME="atlas-pvt-hosted-zone-$FINEX_AWS_REGION"
+STACK_NAME="atlas-pvt-hosted-zone-$ATLAS_AWS_REGION"
 create_aws_stack atlas-private-hosted-zone.json $STACK_NAME

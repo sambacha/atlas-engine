@@ -1,0 +1,75 @@
+spring:
+  applicaton:
+    name: atlas-apigateway
+  zipkin:
+    baseUrl: ${ZIPKIN_URI}
+    sender:
+      type: ${ZIPKIN_SENDER_TYPE}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: ${TLS_KEYSTORE}
+    key-store-password: ${TLS_KEYSTORE_PASSWORD}
+    key-store-type: PKCS12
+
+zuul:
+  routes:
+    atlas-product-service-internal-api:
+      path: /atlas/internal/api/product/**
+      serviceId: atlas-product
+      stripPrefix: false
+    atlas-product-service-external-api:
+      path: /atlas/api/product/**
+      serviceId: atlas-product
+      stripPrefix: false
+    atlas-participant-service-internal-api:
+      path: /atlas/internal/api/participant/**
+      serviceId: atlas-participant
+      stripPrefix: false
+    atlas-participant-service-external-api:
+      path: /atlas/api/participant/**
+      serviceId: atlas-participant
+      stripPrefix: false
+    atlas-order-service-internal-api:
+      path: /atlas/internal/api/order/**
+      serviceId: atlas-order
+      stripPrefix: false
+    atlas-order-service-external-api:
+      path: /atlas/api/order/**
+      serviceId: atlas-order
+      stripPrefix: false
+    atlas-orderbook-service-internal-api:
+      path: /atlas/internal/api/orderBook/**
+      serviceId: atlas-orderbook
+      stripPrefix: false
+    atlas-trade-service-internal-api:
+      path: /atlas/internal/api/trade/**
+      serviceId: atlas-trade
+      stripPrefix: false
+    atlas-trade-service-external-api:
+      path: /atlas/api/trade/**
+      stripPrefix: false
+      serviceId: atlas-trade
+  host:
+    socket-timeout-millis: 30000
+
+ribbon:
+  ReadTimeout: 60000
+
+eureka:
+  client:
+    fetch-registry: true
+    securePortEnabled: true
+    serviceUrl:
+      defaultZone: ${ATLAS_DISCOVERY_URI}
+  instance:
+    nonSecurePortEnabled: false
+    securePortEnabled: true
+    securePort: 443
+    statusPageUrl: https://${ATLAS_DISCOVERY_CLIENT_HOSTNAME}:${eureka.instance.securePort}/actuator/info
+    healthCheckUrl: https://${ATLAS_DISCOVERY_CLIENT_HOSTNAME}:${eureka.instance.securePort}/actuator/health
+    preferIpAddress: false
+    hostname: ${ATLAS_DISCOVERY_CLIENT_HOSTNAME}

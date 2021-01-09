@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: atlas-discovery
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: ${TLS_KEYSTORE}
+    key-store-password: ${TLS_KEYSTORE_PASSWORD}
+    key-store-type: PKCS12
+eureka:
+  server:
+    peer-node-read-timeout-ms: 30000
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    securePortEnabled: true
+    serviceUrl:
+      defaultZone: ${ATLAS_DISCOVERY_URI}
+
+logging:
+  level:
+    root: INFO

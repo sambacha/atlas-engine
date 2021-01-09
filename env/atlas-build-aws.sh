@@ -54,31 +54,31 @@ VPC_BUILD="false"
 while getopts ":g:u:p:r:d:f:c:k:b:s:ti:h" opt; do
   case ${opt} in
     g )
-      FINEX_GIT_REPO=$OPTARG
+      ATLAS_GIT_REPO=$OPTARG
       ;;
     u )
-      FINEX_GIT_USER=$OPTARG
+      ATLAS_GIT_USER=$OPTARG
       ;;
     p )
-      FINEX_GIT_PASSWORD=$OPTARG
+      ATLAS_GIT_PASSWORD=$OPTARG
       ;;
     i )
-      FINEX_DOCKER_USERNAME=$OPTARG
+      ATLAS_DOCKER_USERNAME=$OPTARG
       ;;
     d )
-      FINEX_R53_HOSTED_ZONE_ID=$OPTARG
+      ATLAS_R53_HOSTED_ZONE_ID=$OPTARG
       ;;
     r )
-      FINEX_AWS_REGION=$OPTARG
+      ATLAS_AWS_REGION=$OPTARG
       ;;
     f )
-      FINEX_URL=$OPTARG
+      ATLAS_URL=$OPTARG
       ;;
     k )
-      FINEX_AWS_KEY_NAME=$OPTARG
+      ATLAS_AWS_KEY_NAME=$OPTARG
       ;;
     b )
-      FINEX_BUILD_TARGET=$OPTARG
+      ATLAS_BUILD_TARGET=$OPTARG
       ;;
     c )
       PATH_TO_CLOUDFORMAITON_FILES=$OPTARG
@@ -106,7 +106,7 @@ done
 #shift "$(($OPTIND -1))"
 
 VALID_ARGUMENTS="true"
-if [[ -z "$FINEX_BUILD_TARGET" ]]; then
+if [[ -z "$ATLAS_BUILD_TARGET" ]]; then
     VALID_ARGUMENTS="false"
     echo "Missing build target. Must be one of [vpc, services, all]"
 fi
@@ -116,7 +116,7 @@ if [[ "$VALID_ARGUMENTS" == "false" ]]; then
     exit 1
 fi
 
-if [[ "$FINEX_BUILD_TARGET" == "deploy-vpc" ]]; then
+if [[ "$ATLAS_BUILD_TARGET" == "deploy-vpc" ]]; then
     if [[ -z "$PATH_TO_CLOUDFORMAITON_FILES" ]]; then
       VALID_ARGUMENTS="false"
       echo "Missing path to the directory containing all AWS cloudformation files"
@@ -125,18 +125,18 @@ if [[ "$FINEX_BUILD_TARGET" == "deploy-vpc" ]]; then
         echo "Cloudformation stack file not found in $PATH_TO_CLOUDFORMAITON_FILES/"
         VALID_ARGUMENTS="false"
     fi
-    if [[ -z "$FINEX_AWS_REGION" ]]; then
+    if [[ -z "$ATLAS_AWS_REGION" ]]; then
       VALID_ARGUMENTS="false"
       echo "Missing AWS regions"
     fi
 fi
 
-if [[ "$FINEX_BUILD_TARGET" == "build-services" ]]; then
+if [[ "$ATLAS_BUILD_TARGET" == "build-services" ]]; then
     if [[ -z "$PATH_TO_SOURCE_CODE" ]]; then
         VALID_ARGUMENTS="false"
         echo "Missing path to the directory containing atlas services source code"
     fi
-    if [[ -z "$FINEX_DOCKER_USERNAME" ]]; then
+    if [[ -z "$ATLAS_DOCKER_USERNAME" ]]; then
         VALID_ARGUMENTS="false"
         echo "Missing docker username"
     fi
@@ -148,28 +148,28 @@ if [[ "$FINEX_BUILD_TARGET" == "build-services" ]]; then
     done
 fi
 
-if [[ "$FINEX_BUILD_TARGET" == "deploy-services" ]]; then
+if [[ "$ATLAS_BUILD_TARGET" == "deploy-services" ]]; then
     if [[ -z "$PATH_TO_CLOUDFORMAITON_FILES" ]]; then
       VALID_ARGUMENTS="false"
       echo "Missing path to the directory containing all AWS cloudformation files"
     fi
-    if [[ -z "$FINEX_GIT_REPO" ]]; then
+    if [[ -z "$ATLAS_GIT_REPO" ]]; then
         VALID_ARGUMENTS="false"
         echo "Missing URI to git repo for application services configuration files"
     fi
-    if [[ -z "$FINEX_GIT_USER" ]]; then
+    if [[ -z "$ATLAS_GIT_USER" ]]; then
         VALID_ARGUMENTS="false"
         echo "Missing git username to git repo for application services configuration files"
     fi
-    if [[ -z "$FINEX_GIT_PASSWORD" ]]; then
+    if [[ -z "$ATLAS_GIT_PASSWORD" ]]; then
         VALID_ARGUMENTS="false"
         echo "Missing git password to git repo for application services configuration files"
     fi
-    if [[ -z "$FINEX_AWS_REGION" ]]; then
+    if [[ -z "$ATLAS_AWS_REGION" ]]; then
       VALID_ARGUMENTS="false"
       echo "Missing AWS regions"
     fi
-    if [[ -z "$FINEX_AWS_KEY_NAME" ]]; then
+    if [[ -z "$ATLAS_AWS_KEY_NAME" ]]; then
         VALID_ARGUMENTS="false"
         echo "Missing AWS key name"
     fi
@@ -179,7 +179,7 @@ if [[ "$FINEX_BUILD_TARGET" == "deploy-services" ]]; then
             VALID_ARGUMENTS="false"
         fi
     done
-    if [[ ! -z "$FINEX_R53_HOSTED_ZONE_ID"  && ! -z "$FINEX_URL"  ]]; then
+    if [[ ! -z "$ATLAS_R53_HOSTED_ZONE_ID"  && ! -z "$ATLAS_URL"  ]]; then
         if [ ! -f "$PATH_TO_CLOUDFORMAITON_FILES/atlas-dns.json" ]; then
             echo "Cloudformation stack file not found in $PATH_TO_CLOUDFORMAITON_FILES"
             VALID_ARGUMENTS="false"
@@ -187,16 +187,16 @@ if [[ "$FINEX_BUILD_TARGET" == "deploy-services" ]]; then
     fi
 fi
 
-if [[ "$FINEX_BUILD_TARGET" == "deploy-dmz" ]]; then
+if [[ "$ATLAS_BUILD_TARGET" == "deploy-dmz" ]]; then
     if [[ -z "$PATH_TO_CLOUDFORMAITON_FILES" ]]; then
       VALID_ARGUMENTS="false"
       echo "Missing path to the directory containing all AWS cloudformation files"
     fi
-    if [[ -z "$FINEX_AWS_REGION" ]]; then
+    if [[ -z "$ATLAS_AWS_REGION" ]]; then
       VALID_ARGUMENTS="false"
       echo "Missing AWS regions"
     fi
-    if [[ -z "$FINEX_AWS_KEY_NAME" ]]; then
+    if [[ -z "$ATLAS_AWS_KEY_NAME" ]]; then
         VALID_ARGUMENTS="false"
         echo "Missing AWS key name"
     fi
@@ -208,23 +208,23 @@ if [[ "$VALID_ARGUMENTS" == "false" ]]; then
 fi
 
 
-if [[ "$FINEX_BUILD_TARGET" == "deploy-vpc" ]]; then
-    echo "Doing VPC deployment on region $FINEX_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/atlas-vpc.json"
+if [[ "$ATLAS_BUILD_TARGET" == "deploy-vpc" ]]; then
+    echo "Doing VPC deployment on region $ATLAS_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/atlas-vpc.json"
     export PATH_TO_CLOUDFORMAITON_FILES
-    export FINEX_AWS_REGION
+    export ATLAS_AWS_REGION
     . ./atlas-deploy-vpc.sh
 fi
 
-if [[ "$FINEX_BUILD_TARGET" == "deploy-dmz" ]]; then
+if [[ "$ATLAS_BUILD_TARGET" == "deploy-dmz" ]]; then
     export PATH_TO_CLOUDFORMAITON_FILES
-    export FINEX_AWS_REGION
-    export FINEX_AWS_KEY_NAME
-    echo "Doing DMZ EC2 instance deployment on region $FINEX_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/atlas-vpc.json"
+    export ATLAS_AWS_REGION
+    export ATLAS_AWS_KEY_NAME
+    echo "Doing DMZ EC2 instance deployment on region $ATLAS_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/atlas-vpc.json"
     . ./atlas-deploy-dmz.sh
 fi
 
-if [[ "$FINEX_BUILD_TARGET" == "build-services" ]]; then
-    export FINEX_DOCKER_USERNAME
+if [[ "$ATLAS_BUILD_TARGET" == "build-services" ]]; then
+    export ATLAS_DOCKER_USERNAME
     export PATH_TO_SOURCE_CODE
     export BUILD_OS_JDK_DOCKER_IMAGE
 
@@ -232,20 +232,20 @@ if [[ "$FINEX_BUILD_TARGET" == "build-services" ]]; then
     . ./atlas-build-services.sh
 fi
 
-if [[ "$FINEX_BUILD_TARGET" == "deploy-services" ]]; then
+if [[ "$ATLAS_BUILD_TARGET" == "deploy-services" ]]; then
     export PATH_TO_CLOUDFORMAITON_FILES
-    export FINEX_AWS_REGION
-    export FINEX_AWS_KEY_NAME
-    export FINEX_GIT_REPO
-    export FINEX_GIT_USER
-    export FINEX_GIT_PASSWORD
-    export FINEX_DOCKER_USERNAME
+    export ATLAS_AWS_REGION
+    export ATLAS_AWS_KEY_NAME
+    export ATLAS_GIT_REPO
+    export ATLAS_GIT_USER
+    export ATLAS_GIT_PASSWORD
+    export ATLAS_DOCKER_USERNAME
     
-    echo "Doing services deployment on region $FINEX_AWS_REGION using cloudformation files in $PATH_TO_CLOUDFORMAITON_FILES/"
-    if [[ ! -z "$FINEX_R53_HOSTED_ZONE_ID"  && ! -z "$FINEX_URL"  ]]; then
-        export FINEX_R53_HOSTED_ZONE_ID
-        export FINEX_URL
-        echo "Will use add DNS record for $FINEX_URL on route 53 hosted zone id $FINEX_R53_HOSTED_ZONE_ID"
+    echo "Doing services deployment on region $ATLAS_AWS_REGION using cloudformation files in $PATH_TO_CLOUDFORMAITON_FILES/"
+    if [[ ! -z "$ATLAS_R53_HOSTED_ZONE_ID"  && ! -z "$ATLAS_URL"  ]]; then
+        export ATLAS_R53_HOSTED_ZONE_ID
+        export ATLAS_URL
+        echo "Will use add DNS record for $ATLAS_URL on route 53 hosted zone id $ATLAS_R53_HOSTED_ZONE_ID"
     fi
 
     . ./atlas-deploy-services-aws.sh

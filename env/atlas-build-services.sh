@@ -26,7 +26,7 @@ function maven_build_services() {
 function docker_build_base_image() {
     DOCKER_BUILD_STATUS_OUTPUT=`docker build \
     -f $PATH_TO_SOURCE_CODE/financial-exchange-env/dockerfile.oswithjdk \
-    -t ${FINEX_DOCKER_USERNAME}/atlas-base-osjdk:latest \
+    -t ${ATLAS_DOCKER_USERNAME}/atlas-base-osjdk:latest \
     $PATH_TO_SOURCE_CODE/financial-exchange-env | grep "Successfully tagged"`
 
     DOCKER_BUILD_STATUS=`echo $DOCKER_BUILD_STATUS_OUTPUT  | awk '{print $1, $2}'`
@@ -51,7 +51,7 @@ function docker_build_services() {
     for SVC in "config" "apigateway" "discovery" "products" "participants" "orders" "orderbooks" "trades"; do
         DOCKER_BUILD_STATUS_OUTPUT=`docker build \
         -f $PATH_TO_SOURCE_CODE/financial-exchange-$SVC/dockerfile.$SVC \
-        -t ${FINEX_DOCKER_USERNAME}/atlas-$SVC-aws:latest \
+        -t ${ATLAS_DOCKER_USERNAME}/atlas-$SVC-aws:latest \
         $PATH_TO_SOURCE_CODE/financial-exchange-$SVC | grep "Successfully tagged"`
 
         DOCKER_BUILD_STATUS=`echo $DOCKER_BUILD_STATUS_OUTPUT  | awk '{print $1, $2}'`

@@ -7,12 +7,12 @@
 # Waits for the stack create operation to complete either successfully or in error.
 function create_aws_stack() {
 
-    echo "Creating $2 in AWS region $FINEX_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/$1"
+    echo "Creating $2 in AWS region $ATLAS_AWS_REGION using cloudformation file $PATH_TO_CLOUDFORMAITON_FILES/$1"
     sleep 10   
     if [[ -z "$3" ]]; then
-        CREATE_OUTPUT=`aws --region $FINEX_AWS_REGION cloudformation create-stack --stack-name $2 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
+        CREATE_OUTPUT=`aws --region $ATLAS_AWS_REGION cloudformation create-stack --stack-name $2 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
     else
-        CREATE_OUTPUT=`aws --region $FINEX_AWS_REGION cloudformation create-stack --stack-name $2 --parameters $3 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
+        CREATE_OUTPUT=`aws --region $ATLAS_AWS_REGION cloudformation create-stack --stack-name $2 --parameters $3 --template-body file://$PATH_TO_CLOUDFORMAITON_FILES/$1`
     fi
 
     if [[ "$CREATE_OUTPUT" =~ "StackId" ]]; then
@@ -28,7 +28,7 @@ function create_aws_stack() {
     while [ $STACK_CREATED -eq 0 ]
     do 
         sleep 30
-        STACK_STATUS=`aws --region $FINEX_AWS_REGION cloudformation describe-stacks --stack-name $2 --query "Stacks[0].StackStatus" | tr '"' ' ' | tr -d [:space:]`
+        STACK_STATUS=`aws --region $ATLAS_AWS_REGION cloudformation describe-stacks --stack-name $2 --query "Stacks[0].StackStatus" | tr '"' ' ' | tr -d [:space:]`
         if [[ "$STACK_STATUS" == "CREATE_COMPLETE" ]]; then
             echo "$2 stack creation is complete"
             STACK_CREATED=1
@@ -58,12 +58,12 @@ function create_aws_stack() {
 # $1 is AWS stack name
 # $2 is OutputKey name
 function get_aws_stack_output() {
-    OUTPUT_VALUE=`aws --region $FINEX_AWS_REGION cloudformation describe-stacks --stack-name $1 --query "Stacks[0].Outputs[?OutputKey=='$2'].OutputValue" --output text`
+    OUTPUT_VALUE=`aws --region $ATLAS_AWS_REGION cloudformation describe-stacks --stack-name $1 --query "Stacks[0].Outputs[?OutputKey=='$2'].OutputValue" --output text`
     echo "$OUTPUT_VALUE"
 }
 
-STACK_NAME="atlas-dmz-$FINEX_AWS_REGION"
-create_aws_stack atlas-dmz-ec2.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$FINEX_AWS_KEY_NAME"
+STACK_NAME="atlas-dmz-$ATLAS_AWS_REGION"
+create_aws_stack atlas-dmz-ec2.json $STACK_NAME "ParameterKey=KeyName,ParameterValue=$ATLAS_AWS_KEY_NAME"
 DMZ_EC2_DNS=`get_aws_stack_output $STACK_NAME AtlasPublicDnsName`
 echo "DMZ instance DNS is [$DMZ_EC2_DNS]"
 

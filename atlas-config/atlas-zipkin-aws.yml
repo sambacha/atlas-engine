@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: atlas-zipkin
+server:
+  port: 9411
+  ssl:
+    enabled: false
+logging:
+  level:
+    root: INFO
